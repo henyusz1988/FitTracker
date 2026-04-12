@@ -4,15 +4,16 @@
  */
 
 import React, { useState, useEffect } from "react";
-import { Plus, History as HistoryIcon, LayoutDashboard, Dumbbell, Scale, LogOut, User as UserIcon } from "lucide-react";
+import { Plus, History as HistoryIcon, LayoutDashboard, Dumbbell, Scale, LogOut, User as UserIcon, Settings as SettingsIcon } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Workout, WeightLog, MealLog, DailyMetrics } from "@/src/types";
+import { Workout, WeightLog, MealLog, DailyMetrics, UserConfig } from "@/src/types";
 import { 
   subscribeWorkouts, saveWorkout as fsSaveWorkout, deleteWorkout as fsDeleteWorkout,
   subscribeWeightLogs, saveWeightLog as fsSaveWeightLog,
   subscribeMealLogs, saveMealLog as fsSaveMealLog,
   subscribeDailyMetrics, saveDailyMetrics as fsSaveDailyMetrics,
+  subscribeUserConfig, saveUserConfig as fsSaveUserConfig,
   testConnection
 } from "@/src/services/firestore";
 import { auth, signOut, onAuthStateChanged } from "@/src/firebase";
@@ -25,6 +26,7 @@ import Dashboard from "@/src/components/Dashboard";
 import Login from "@/src/components/Login";
 import DateSelector from "@/src/components/DateSelector";
 import LanguageSelector from "@/src/components/LanguageSelector";
+import Settings from "@/src/components/Settings";
 import { ErrorBoundary } from "@/src/components/ErrorBoundary";
 import { motion, AnimatePresence } from "motion/react";
 import { useTranslation } from "react-i18next";
@@ -42,6 +44,8 @@ export default function App() {
   const [editingWorkout, setEditingWorkout] = useState<Workout | null>(null);
   const [isLogging, setIsLogging] = useState(false);
   const [isLoggingDaily, setIsLoggingDaily] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [userConfig, setUserConfig] = useState<UserConfig | null>(null);
 
   useEffect(() => {
     testConnection();
@@ -79,12 +83,14 @@ export default function App() {
     const unsubWeight = subscribeWeightLogs(user.uid, setWeightLogs);
     const unsubMeals = subscribeMealLogs(user.uid, setMealLogs);
     const unsubMetrics = subscribeDailyMetrics(user.uid, setMetrics);
+    const unsubConfig = subscribeUserConfig(user.uid, setUserConfig);
 
     return () => {
       unsubWorkouts();
       unsubWeight();
       unsubMeals();
       unsubMetrics();
+      unsubConfig();
     };
   }, [user]);
 
@@ -129,6 +135,12 @@ export default function App() {
   const startNewWorkout = () => {
     setEditingWorkout(null);
     setIsLogging(true);
+  };
+
+  const handleSaveConfig = async (config: UserConfig) => {
+    if (!user) return;
+    await fsSaveUserConfig({ ...config, uid: user.uid });
+    setIsSettingsOpen(false);
   };
 
   if (!isAuthReady) {
@@ -198,6 +210,15 @@ export default function App() {
   return (
     <ErrorBoundary>
       <div className="min-h-screen bg-background pb-24">
+        <AnimatePresence>
+          {isSettingsOpen && (
+            <Settings 
+              config={userConfig} 
+              onSave={handleSaveConfig} 
+              onClose={() => setIsSettingsOpen(false)} 
+            />
+          )}
+        </AnimatePresence>
         <header className="p-6 flex items-center justify-between max-w-2xl mx-auto">
           <div className="flex items-center gap-2">
             <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/20">
@@ -205,7 +226,10 @@ export default function App() {
             </div>
             <div>
               <h1 className="text-2xl font-bold leading-none">{APP_NAME}</h1>
-              <span className="text-[10px] font-mono text-muted-foreground">v{BUILD_VERSION}</span>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-mono text-muted-foreground">v{BUILD_VERSION}</span>
+                <span className="text-[9px] text-muted-foreground/60 font-medium">developed by Peter Henyusz</span>
+              </div>
             </div>
           </div>
           <div className="flex gap-2">
@@ -223,6 +247,14 @@ export default function App() {
               <Plus className="w-6 h-6" />
             </Button>
             <LanguageSelector />
+            <Button 
+              variant="ghost"
+              onClick={() => setIsSettingsOpen(true)}
+              className="rounded-full w-12 h-12 p-0 text-muted-foreground hover:text-primary"
+              title={t('settings')}
+            >
+              <SettingsIcon className="w-5 h-5" />
+            </Button>
             <Button 
               variant="ghost"
               onClick={handleLogout}
@@ -255,6 +287,7 @@ export default function App() {
                 mealLogs={mealLogs} 
                 metrics={metrics} 
                 selectedDate={selectedDate}
+                config={userConfig}
               />
             </TabsContent>
             <TabsContent value="history" className="mt-0 focus-visible:ring-0">

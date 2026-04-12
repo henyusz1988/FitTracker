@@ -59,7 +59,15 @@ const resources = {
       "weak_password": "Password is too weak. Please use at least 6 characters.",
       "invalid_credential": "Invalid username or password.",
       "operation_not_allowed": "Email/Password login is not enabled.",
-      "permission_denied": "Account created, but failed to set up profile."
+      "permission_denied": "Account created, but failed to set up profile.",
+      "progress_chart": "Progress Chart",
+      "close": "Close",
+      "settings": "Settings",
+      "customise": "Customise",
+      "reorder_stats": "Reorder Dashboard Stats",
+      "move_up": "Move Up",
+      "move_down": "Move Down",
+      "save_changes": "Save Changes"
     }
   },
   hu: {
@@ -118,7 +126,15 @@ const resources = {
       "weak_password": "A jelszó túl gyenge. Legalább 6 karaktert használjon.",
       "invalid_credential": "Érvénytelen felhasználónév vagy jelszó.",
       "operation_not_allowed": "Az e-mail/jelszó bejelentkezés nincs engedélyezve.",
-      "permission_denied": "Fiók létrehozva, de a profil beállítása sikertelen."
+      "permission_denied": "Fiók létrehozva, de a profil beállítása sikertelen.",
+      "progress_chart": "Fejlődési Grafikon",
+      "close": "Bezárás",
+      "settings": "Beállítások",
+      "customise": "Testreszabás",
+      "reorder_stats": "Irányítópult statisztikák sorrendje",
+      "move_up": "Mozgatás fel",
+      "move_down": "Mozgatás le",
+      "save_changes": "Módosítások mentése"
     }
   }
 };

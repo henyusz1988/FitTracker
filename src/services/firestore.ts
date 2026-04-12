@@ -12,7 +12,7 @@ import {
   serverTimestamp
 } from 'firebase/firestore';
 import { db, auth } from '../firebase';
-import { Workout, WeightLog, MealLog, DailyMetrics } from '../types';
+import { Workout, WeightLog, MealLog, DailyMetrics, UserConfig } from '../types';
 
 enum OperationType {
   CREATE = 'create',
@@ -151,6 +151,27 @@ export const saveDailyMetrics = async (metrics: DailyMetrics) => {
   const path = `users/${metrics.userId}/dailyMetrics`;
   try {
     await setDoc(doc(db, path, metrics.id), metrics);
+  } catch (error) {
+    handleFirestoreError(error, OperationType.WRITE, path);
+  }
+};
+
+// User Config
+export const subscribeUserConfig = (userId: string, callback: (config: UserConfig | null) => void) => {
+  const path = `users/${userId}/config/settings`;
+  return onSnapshot(doc(db, path), (snapshot) => {
+    if (snapshot.exists()) {
+      callback(snapshot.data() as UserConfig);
+    } else {
+      callback(null);
+    }
+  }, (error) => handleFirestoreError(error, OperationType.GET, path));
+};
+
+export const saveUserConfig = async (config: UserConfig) => {
+  const path = `users/${config.uid}/config/settings`;
+  try {
+    await setDoc(doc(db, path), config);
   } catch (error) {
     handleFirestoreError(error, OperationType.WRITE, path);
   }

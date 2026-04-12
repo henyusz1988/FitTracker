@@ -25,10 +25,8 @@ export default function LanguageSelector() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="rounded-full w-10 h-10 p-0 text-muted-foreground hover:text-primary">
-          <Languages className="w-5 h-5" />
-        </Button>
+      <DropdownMenuTrigger className="rounded-full w-10 h-10 p-0 text-muted-foreground hover:text-primary hover:bg-muted transition-colors flex items-center justify-center outline-none focus-visible:ring-2 focus-visible:ring-primary">
+        <Languages className="w-5 h-5" />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-40 rounded-xl border-none shadow-xl bg-white/90 backdrop-blur-md">
         {languages.map((lang) => (

@@ -63,3 +63,8 @@ export interface DailyMetrics {
   sleepQuality: number; // 1-10
   waterIntake: number; // in Liters
 }
+
+export interface UserConfig {
+  uid: string;
+  statOrder: string[];
+}

@@ -1,0 +1,137 @@
+import i18n from 'i18next';
+import { initReactI18next } from 'react-i18next';
+import LanguageDetector from 'i18next-browser-languagedetector';
+
+const resources = {
+  en: {
+    translation: {
+      "welcome_back": "Welcome back",
+      "home": "Home",
+      "history": "History",
+      "logout": "Logout",
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "back_to_today": "Back to Today",
+      "daily_motivation": "Daily Motivation",
+      "body_weight": "Body Weight",
+      "water_intake": "Water Intake",
+      "sleep_quality": "Sleep Quality",
+      "stress_level": "Stress Level",
+      "nutrition": "Nutrition",
+      "workouts": "Workouts",
+      "recorded": "Recorded",
+      "no_record": "No record",
+      "daily": "Daily",
+      "quality": "Quality",
+      "level": "Level",
+      "no_nutrition_data": "No nutrition data logged for this day.",
+      "no_workouts_data": "No workouts recorded for this day.",
+      "exercises": "exercises",
+      "daily_log": "Daily Log",
+      "save": "Save",
+      "add_food": "Add Food",
+      "add_supplement": "Add Supplement",
+      "add_vitamin": "Add Vitamin",
+      "what_did_you_eat": "What did you eat?",
+      "how_much": "How much?",
+      "name": "Name",
+      "amount": "Amount",
+      "very_relaxed": "Very Relaxed",
+      "moderate": "Moderate",
+      "highly_stressed": "Highly Stressed",
+      "very_poor": "Very Poor",
+      "fair": "Fair",
+      "excellent": "Excellent",
+      "username": "Username",
+      "password": "Password",
+      "sign_in": "Sign In",
+      "create_account": "Create Account",
+      "need_account": "Need a new account? Register here",
+      "have_account": "Already have an account? Sign in",
+      "secure_login": "Secure Login",
+      "choose_username": "Choose a unique username",
+      "set_password": "Set a secure password",
+      "processing": "Processing...",
+      "login_error": "Authentication failed. Please check your credentials.",
+      "user_not_found": "User not found. Would you like to create a new account?",
+      "wrong_password": "Incorrect password. Please try again.",
+      "email_in_use": "Username already taken. Please choose another.",
+      "weak_password": "Password is too weak. Please use at least 6 characters.",
+      "invalid_credential": "Invalid username or password.",
+      "operation_not_allowed": "Email/Password login is not enabled.",
+      "permission_denied": "Account created, but failed to set up profile."
+    }
+  },
+  hu: {
+    translation: {
+      "welcome_back": "Üdvözöljük újra",
+      "home": "Főoldal",
+      "history": "Előzmények",
+      "logout": "Kijelentkezés",
+      "today": "Ma",
+      "yesterday": "Tegnap",
+      "back_to_today": "Vissza a mához",
+      "daily_motivation": "Napi Motiváció",
+      "body_weight": "Testsúly",
+      "water_intake": "Vízbevitel",
+      "sleep_quality": "Alvásminőség",
+      "stress_level": "Stressz szint",
+      "nutrition": "Táplálkozás",
+      "workouts": "Edzések",
+      "recorded": "Rögzítve",
+      "no_record": "Nincs adat",
+      "daily": "Napi",
+      "quality": "Minőség",
+      "level": "Szint",
+      "no_nutrition_data": "Ezen a napon nincs rögzített táplálkozási adat.",
+      "no_workouts_data": "Ezen a napon nincs rögzített edzés.",
+      "exercises": "gyakorlat",
+      "daily_log": "Napi Napló",
+      "save": "Mentés",
+      "add_food": "Étel hozzáadása",
+      "add_supplement": "Kiegészítő hozzáadása",
+      "add_vitamin": "Vitamin hozzáadása",
+      "what_did_you_eat": "Mit ettél?",
+      "how_much": "Mennyit?",
+      "name": "Név",
+      "amount": "Mennyiség",
+      "very_relaxed": "Nagyon nyugodt",
+      "moderate": "Mérsékelt",
+      "highly_stressed": "Nagyon stresszes",
+      "very_poor": "Nagyon rossz",
+      "fair": "Közepes",
+      "excellent": "Kiváló",
+      "username": "Felhasználónév",
+      "password": "Jelszó",
+      "sign_in": "Bejelentkezés",
+      "create_account": "Fiók létrehozása",
+      "need_account": "Új fiókra van szüksége? Regisztráljon itt",
+      "have_account": "Már van fiókja? Jelentkezzen be",
+      "secure_login": "Biztonságos Bejelentkezés",
+      "choose_username": "Válasszon egyedi felhasználónevet",
+      "set_password": "Állítson be biztonságos jelszót",
+      "processing": "Feldolgozás...",
+      "login_error": "A hitelesítés sikertelen. Ellenőrizze adatait.",
+      "user_not_found": "Felhasználó nem található. Szeretne új fiókot létrehozni?",
+      "wrong_password": "Helytelen jelszó. Próbálja újra.",
+      "email_in_use": "A felhasználónév már foglalt. Válasszon másikat.",
+      "weak_password": "A jelszó túl gyenge. Legalább 6 karaktert használjon.",
+      "invalid_credential": "Érvénytelen felhasználónév vagy jelszó.",
+      "operation_not_allowed": "Az e-mail/jelszó bejelentkezés nincs engedélyezve.",
+      "permission_denied": "Fiók létrehozva, de a profil beállítása sikertelen."
+    }
+  }
+};
+
+i18n
+  .use(LanguageDetector)
+  .use(initReactI18next)
+  .init({
+    resources,
+    fallbackLng: 'en',
+    interpolation: {
+      escapeValue: false
+    }
+  });
+
+export default i18n;

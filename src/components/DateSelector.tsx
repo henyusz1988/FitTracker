@@ -2,6 +2,7 @@ import React from "react";
 import { ChevronLeft, ChevronRight, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "motion/react";
+import { useTranslation } from "react-i18next";
 
 interface DateSelectorProps {
   selectedDate: Date;
@@ -9,6 +10,7 @@ interface DateSelectorProps {
 }
 
 export default function DateSelector({ selectedDate, onDateChange }: DateSelectorProps) {
+  const { t } = useTranslation();
   const isToday = (date: Date) => {
     const today = new Date();
     return date.getDate() === today.getDate() &&
@@ -23,17 +25,17 @@ export default function DateSelector({ selectedDate, onDateChange }: DateSelecto
   };
 
   const formatDate = (date: Date) => {
-    if (isToday(date)) return "Today";
+    if (isToday(date)) return t('today');
     
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
     if (date.getDate() === yesterday.getDate() &&
         date.getMonth() === yesterday.getMonth() &&
         date.getFullYear() === yesterday.getFullYear()) {
-      return "Yesterday";
+      return t('yesterday');
     }
 
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
   };
 
   return (
@@ -62,7 +64,7 @@ export default function DateSelector({ selectedDate, onDateChange }: DateSelecto
             onClick={() => onDateChange(new Date())}
             className="text-[10px] font-bold text-primary uppercase tracking-wider hover:underline"
           >
-            Back to Today
+            {t('back_to_today')}
           </button>
         )}
       </motion.div>

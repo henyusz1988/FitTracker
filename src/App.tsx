@@ -24,10 +24,13 @@ import History from "@/src/components/History";
 import Dashboard from "@/src/components/Dashboard";
 import Login from "@/src/components/Login";
 import DateSelector from "@/src/components/DateSelector";
+import LanguageSelector from "@/src/components/LanguageSelector";
 import { ErrorBoundary } from "@/src/components/ErrorBoundary";
 import { motion, AnimatePresence } from "motion/react";
+import { useTranslation } from "react-i18next";
 
 export default function App() {
+  const { t } = useTranslation();
   const [user, setUser] = useState<User | null>(null);
   const [isAuthReady, setIsAuthReady] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -42,12 +45,26 @@ export default function App() {
 
   useEffect(() => {
     testConnection();
+    
+    // Safety timeout for auth readiness
+    const timeout = setTimeout(() => {
+      if (!isAuthReady) {
+        console.warn("Auth check timed out, forcing ready state");
+        setIsAuthReady(true);
+      }
+    }, 5000);
+
     const unsubscribe = onAuthStateChanged(auth, (u) => {
       setUser(u);
       setIsAuthReady(true);
+      clearTimeout(timeout);
     });
-    return () => unsubscribe();
-  }, []);
+    
+    return () => {
+      unsubscribe();
+      clearTimeout(timeout);
+    };
+  }, [isAuthReady]);
 
   useEffect(() => {
     if (!user) {
@@ -116,8 +133,19 @@ export default function App() {
 
   if (!isAuthReady) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-[100dvh] flex flex-col items-center justify-center p-6 space-y-4">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        <div className="text-center space-y-2">
+          <p className="text-sm font-medium text-muted-foreground">Initializing GymBro...</p>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => setIsAuthReady(true)}
+            className="text-[10px] uppercase tracking-widest font-bold opacity-50 hover:opacity-100"
+          >
+            Skip Loading
+          </Button>
+        </div>
       </div>
     );
   }
@@ -194,11 +222,12 @@ export default function App() {
             >
               <Plus className="w-6 h-6" />
             </Button>
+            <LanguageSelector />
             <Button 
               variant="ghost"
               onClick={handleLogout}
               className="rounded-full w-12 h-12 p-0 text-muted-foreground hover:text-destructive"
-              title="Logout"
+              title={t('logout')}
             >
               <LogOut className="w-5 h-5" />
             </Button>
@@ -211,7 +240,7 @@ export default function App() {
               <UserIcon className="w-5 h-5 text-primary" />
             </div>
             <div>
-              <p className="text-xs font-bold text-primary uppercase tracking-wider">Welcome back</p>
+              <p className="text-xs font-bold text-primary uppercase tracking-wider">{t('welcome_back')}</p>
               <p className="text-sm font-bold">{user.email?.split('@')[0]}</p>
             </div>
           </div>
@@ -247,7 +276,7 @@ export default function App() {
               }`}
             >
               <LayoutDashboard className="w-5 h-5" />
-              {activeTab === "dashboard" && <span className="text-[10px] font-bold uppercase tracking-wider">Home</span>}
+              {activeTab === "dashboard" && <span className="text-[10px] font-bold uppercase tracking-wider">{t('home')}</span>}
             </button>
             
             <button
@@ -257,7 +286,7 @@ export default function App() {
               }`}
             >
               <HistoryIcon className="w-5 h-5" />
-              {activeTab === "history" && <span className="text-[10px] font-bold uppercase tracking-wider">History</span>}
+              {activeTab === "history" && <span className="text-[10px] font-bold uppercase tracking-wider">{t('history')}</span>}
             </button>
           </div>
         </nav>

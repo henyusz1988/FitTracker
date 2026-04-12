@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { WeightLog, MealLog, Meal, DailyMetrics, Supplement, Vitamin } from "@/src/types";
 import { motion, AnimatePresence } from "motion/react";
+import { useTranslation } from "react-i18next";
 
 interface DailyLogProps {
   onSaveWeight: (log: WeightLog) => void;
@@ -19,6 +20,7 @@ interface DailyLogProps {
 }
 
 export default function DailyLog({ onSaveWeight, onSaveMeals, onSaveMetrics, onCancel, initialWeight, initialMeals, initialMetrics, selectedDate }: DailyLogProps) {
+  const { t } = useTranslation();
   const [weight, setWeight] = useState<string>(initialWeight?.weight.toString() || "");
   const [meals, setMeals] = useState<Meal[]>(initialMeals?.meals || []);
   const [supps, setSupps] = useState<Supplement[]>(initialMetrics?.supplements || []);
@@ -88,7 +90,7 @@ export default function DailyLog({ onSaveWeight, onSaveMeals, onSaveMetrics, onC
     <div className="space-y-6 max-w-2xl mx-auto pb-20">
       <div className="flex items-center justify-between sticky top-0 bg-background/80 backdrop-blur-sm z-10 py-4 border-b">
         <div>
-          <h2 className="text-2xl font-bold">Daily Log</h2>
+          <h2 className="text-2xl font-bold">{t('daily_log')}</h2>
           <p className="text-sm text-muted-foreground">{selectedDate.toLocaleDateString()}</p>
         </div>
         <div className="flex gap-2">
@@ -97,7 +99,7 @@ export default function DailyLog({ onSaveWeight, onSaveMeals, onSaveMetrics, onC
           </Button>
           <Button onClick={handleSave} className="bg-primary text-white">
             <Save className="w-4 h-4 mr-2" />
-            Save
+            {t('save')}
           </Button>
         </div>
       </div>
@@ -106,7 +108,7 @@ export default function DailyLog({ onSaveWeight, onSaveMeals, onSaveMetrics, onC
         <Card className="border-none shadow-sm bg-white/50">
           <CardHeader className="flex flex-row items-center gap-2">
             <Scale className="w-5 h-5 text-primary" />
-            <CardTitle className="text-lg">Body Weight</CardTitle>
+            <CardTitle className="text-lg">{t('body_weight')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-4">
@@ -130,7 +132,7 @@ export default function DailyLog({ onSaveWeight, onSaveMeals, onSaveMetrics, onC
         <Card className="border-none shadow-sm bg-white/50">
           <CardHeader className="flex flex-row items-center gap-2">
             <Droplets className="w-5 h-5 text-blue-500" />
-            <CardTitle className="text-lg">Water Intake</CardTitle>
+            <CardTitle className="text-lg">{t('water_intake')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-4">
@@ -156,7 +158,7 @@ export default function DailyLog({ onSaveWeight, onSaveMeals, onSaveMetrics, onC
         <Card className="border-none shadow-sm bg-white/50">
           <CardHeader className="flex flex-row items-center gap-2">
             <Brain className="w-5 h-5 text-red-500" />
-            <CardTitle className="text-lg">Stress Level</CardTitle>
+            <CardTitle className="text-lg">{t('stress_level')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="relative">
@@ -167,7 +169,7 @@ export default function DailyLog({ onSaveWeight, onSaveMeals, onSaveMetrics, onC
               >
                 {[...Array(10)].map((_, i) => (
                   <option key={i + 1} value={i + 1}>
-                    {i + 1} - {i + 1 === 1 ? 'Very Relaxed' : i + 1 === 5 ? 'Moderate' : i + 1 === 10 ? 'Highly Stressed' : `Level ${i + 1}`}
+                    {i + 1} - {i + 1 === 1 ? t('very_relaxed') : i + 1 === 5 ? t('moderate') : i + 1 === 10 ? t('highly_stressed') : `Level ${i + 1}`}
                   </option>
                 ))}
               </select>
@@ -182,7 +184,7 @@ export default function DailyLog({ onSaveWeight, onSaveMeals, onSaveMetrics, onC
         <Card className="border-none shadow-sm bg-white/50">
           <CardHeader className="flex flex-row items-center gap-2">
             <Moon className="w-5 h-5 text-indigo-500" />
-            <CardTitle className="text-lg">Sleep Quality</CardTitle>
+            <CardTitle className="text-lg">{t('sleep_quality')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="relative">
@@ -193,7 +195,7 @@ export default function DailyLog({ onSaveWeight, onSaveMeals, onSaveMetrics, onC
               >
                 {[...Array(10)].map((_, i) => (
                   <option key={i + 1} value={i + 1}>
-                    {i + 1} - {i + 1 === 1 ? 'Very Poor' : i + 1 === 5 ? 'Fair' : i + 1 === 10 ? 'Excellent' : `Level ${i + 1}`}
+                    {i + 1} - {i + 1 === 1 ? t('very_poor') : i + 1 === 5 ? t('fair') : i + 1 === 10 ? t('excellent') : `Level ${i + 1}`}
                   </option>
                 ))}
               </select>
@@ -210,11 +212,11 @@ export default function DailyLog({ onSaveWeight, onSaveMeals, onSaveMetrics, onC
         <CardHeader className="flex flex-row items-center justify-between">
           <div className="flex items-center gap-2">
             <Utensils className="w-5 h-5 text-primary" />
-            <CardTitle className="text-lg">Nutrition</CardTitle>
+            <CardTitle className="text-lg">{t('nutrition')}</CardTitle>
           </div>
           <Button variant="outline" size="sm" onClick={addMeal}>
             <Plus className="w-4 h-4 mr-2" />
-            Add Food
+            {t('add_food')}
           </Button>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -222,8 +224,8 @@ export default function DailyLog({ onSaveWeight, onSaveMeals, onSaveMetrics, onC
             {meals.map((meal) => (
               <motion.div key={meal.id} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }} className="flex gap-2 items-start">
                 <div className="flex-1 space-y-2">
-                  <Input placeholder="What did you eat?" value={meal.name} onChange={(e) => setMeals(meals.map(m => m.id === meal.id ? { ...m, name: e.target.value } : m))} />
-                  <Input placeholder="How much? (e.g. 200g, 1 bowl)" value={meal.amount} onChange={(e) => setMeals(meals.map(m => m.id === meal.id ? { ...m, amount: e.target.value } : m))} className="text-sm h-8" />
+                  <Input placeholder={t('what_did_you_eat')} value={meal.name} onChange={(e) => setMeals(meals.map(m => m.id === meal.id ? { ...m, name: e.target.value } : m))} />
+                  <Input placeholder={t('how_much')} value={meal.amount} onChange={(e) => setMeals(meals.map(m => m.id === meal.id ? { ...m, amount: e.target.value } : m))} className="text-sm h-8" />
                 </div>
                 <Button variant="ghost" size="icon" onClick={() => setMeals(meals.filter(m => m.id !== meal.id))} className="mt-1"><Trash2 className="w-4 h-4 text-destructive" /></Button>
               </motion.div>
@@ -240,15 +242,15 @@ export default function DailyLog({ onSaveWeight, onSaveMeals, onSaveMetrics, onC
           </div>
           <Button variant="outline" size="sm" onClick={addSupp}>
             <Plus className="w-4 h-4 mr-2" />
-            Add Supplement
+            {t('add_supplement')}
           </Button>
         </CardHeader>
         <CardContent className="space-y-4">
           {supps.map((supp) => (
             <div key={supp.id} className="flex gap-2 items-center">
-              <Input placeholder="Name" value={supp.name} onChange={(e) => setSupps(supps.map(s => s.id === supp.id ? { ...s, name: e.target.value } : s))} className="flex-1" />
+              <Input placeholder={t('name')} value={supp.name} onChange={(e) => setSupps(supps.map(s => s.id === supp.id ? { ...s, name: e.target.value } : s))} className="flex-1" />
               <div className="flex items-center gap-2 w-32">
-                <Input type="number" placeholder="Amount" value={supp.amountGrams || ""} onChange={(e) => setSupps(supps.map(s => s.id === supp.id ? { ...s, amountGrams: parseFloat(e.target.value) } : s))} />
+                <Input type="number" placeholder={t('amount')} value={supp.amountGrams || ""} onChange={(e) => setSupps(supps.map(s => s.id === supp.id ? { ...s, amountGrams: parseFloat(e.target.value) } : s))} />
                 <span className="text-xs font-bold text-muted-foreground">g</span>
               </div>
               <Button variant="ghost" size="icon" onClick={() => setSupps(supps.filter(s => s.id !== supp.id))}><Trash2 className="w-4 h-4 text-destructive" /></Button>
@@ -265,15 +267,15 @@ export default function DailyLog({ onSaveWeight, onSaveMeals, onSaveMetrics, onC
           </div>
           <Button variant="outline" size="sm" onClick={addVit}>
             <Plus className="w-4 h-4 mr-2" />
-            Add Vitamin
+            {t('add_vitamin')}
           </Button>
         </CardHeader>
         <CardContent className="space-y-4">
           {vits.map((vit) => (
             <div key={vit.id} className="flex gap-2 items-center">
-              <Input placeholder="Name" value={vit.name} onChange={(e) => setVits(vits.map(v => v.id === vit.id ? { ...v, name: e.target.value } : v))} className="flex-1" />
+              <Input placeholder={t('name')} value={vit.name} onChange={(e) => setVits(vits.map(v => v.id === vit.id ? { ...v, name: e.target.value } : v))} className="flex-1" />
               <div className="flex items-center gap-2 w-32">
-                <Input type="number" placeholder="Amount" value={vit.amountMg || ""} onChange={(e) => setVits(vits.map(v => v.id === vit.id ? { ...v, amountMg: parseFloat(e.target.value) } : v))} />
+                <Input type="number" placeholder={t('amount')} value={vit.amountMg || ""} onChange={(e) => setVits(vits.map(v => v.id === vit.id ? { ...v, amountMg: parseFloat(e.target.value) } : v))} />
                 <span className="text-xs font-bold text-muted-foreground">mg</span>
               </div>
               <Button variant="ghost" size="icon" onClick={() => setVits(vits.filter(v => v.id !== vit.id))}><Trash2 className="w-4 h-4 text-destructive" /></Button>

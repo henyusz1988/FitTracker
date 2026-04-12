@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Workout } from "@/src/types";
 import { motion } from "motion/react";
+import { useTranslation } from "react-i18next";
 
 interface HistoryProps {
   workouts: Workout[];
@@ -13,6 +14,8 @@ interface HistoryProps {
 }
 
 export default function History({ workouts, onEdit, onDelete }: HistoryProps) {
+  const { t } = useTranslation();
+
   if (workouts.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">
@@ -20,7 +23,7 @@ export default function History({ workouts, onEdit, onDelete }: HistoryProps) {
           <Dumbbell className="w-8 h-8 text-muted-foreground" />
         </div>
         <div>
-          <h3 className="text-lg font-semibold">No workouts yet</h3>
+          <h3 className="text-lg font-semibold">{t('no_workouts_data')}</h3>
           <p className="text-sm text-muted-foreground">Start your fitness journey by logging your first workout!</p>
         </div>
       </div>

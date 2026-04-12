@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Workout, WeightLog, MealLog, DailyMetrics } from "@/src/types";
 import { motion } from "motion/react";
 import { GoogleGenAI } from "@google/genai";
+import { useTranslation } from "react-i18next";
 
 interface DashboardProps {
   workouts: Workout[];
@@ -14,6 +15,7 @@ interface DashboardProps {
 }
 
 export default function Dashboard({ workouts, weightLogs, mealLogs, metrics, selectedDate }: DashboardProps) {
+  const { t } = useTranslation();
   const [tip, setTip] = useState<string>("Loading your daily motivation...");
   const [loadingTip, setLoadingTip] = useState(true);
 
@@ -45,36 +47,36 @@ export default function Dashboard({ workouts, weightLogs, mealLogs, metrics, sel
 
   const stats = [
     {
-      title: "Body Weight",
+      title: t('body_weight'),
       value: dayWeight ? `${dayWeight.weight}kg` : "--",
       icon: Scale,
       color: "text-purple-500",
       bg: "bg-purple-50",
-      sub: dayWeight ? "Recorded" : "No record"
+      sub: dayWeight ? t('recorded') : t('no_record')
     },
     {
-      title: "Water Intake",
+      title: t('water_intake'),
       value: dayMetrics?.waterIntake ? `${dayMetrics.waterIntake}L` : "--",
       icon: Droplets,
       color: "text-blue-500",
       bg: "bg-blue-50",
-      sub: "Daily"
+      sub: t('daily')
     },
     {
-      title: "Sleep Quality",
+      title: t('sleep_quality'),
       value: dayMetrics?.sleepQuality ? `${dayMetrics.sleepQuality}/10` : "--",
       icon: Moon,
       color: "text-indigo-500",
       bg: "bg-indigo-50",
-      sub: "Quality"
+      sub: t('quality')
     },
     {
-      title: "Stress Level",
+      title: t('stress_level'),
       value: dayMetrics?.stressLevel ? `${dayMetrics.stressLevel}/10` : "--",
       icon: Brain,
       color: "text-red-500",
       bg: "bg-red-50",
-      sub: "Level"
+      sub: t('level')
     },
   ];
 
@@ -90,7 +92,7 @@ export default function Dashboard({ workouts, weightLogs, mealLogs, metrics, sel
               <Sparkles className="w-5 h-5 text-primary" />
             </div>
             <div className="flex-1">
-              <p className="text-[10px] uppercase tracking-widest font-bold text-primary/70 mb-1">Daily Motivation</p>
+              <p className="text-[10px] uppercase tracking-widest font-bold text-primary/70 mb-1">{t('daily_motivation')}</p>
               <p className="text-sm font-medium leading-tight italic">"{tip}"</p>
             </div>
           </CardContent>
@@ -128,12 +130,12 @@ export default function Dashboard({ workouts, weightLogs, mealLogs, metrics, sel
           <CardHeader className="pb-2">
             <CardTitle className="text-lg flex items-center gap-2">
               <Utensils className="w-4 h-4" />
-              Nutrition
+              {t('nutrition')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {dayMeals.length === 0 && (!dayMetrics?.supplements.length) && (!dayMetrics?.vitamins.length) ? (
-              <p className="text-sm text-muted-foreground italic py-4">No nutrition data logged for this day.</p>
+              <p className="text-sm text-muted-foreground italic py-4">{t('no_nutrition_data')}</p>
             ) : (
               <div className="space-y-4">
                 {dayMeals.length > 0 && (
@@ -178,18 +180,18 @@ export default function Dashboard({ workouts, weightLogs, mealLogs, metrics, sel
           <CardHeader className="pb-2">
             <CardTitle className="text-lg flex items-center gap-2">
               <Activity className="w-4 h-4" />
-              Workouts
+              {t('workouts')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             {dayWorkouts.length === 0 ? (
-              <p className="text-sm text-muted-foreground italic py-4">No workouts recorded for this day.</p>
+              <p className="text-sm text-muted-foreground italic py-4">{t('no_workouts_data')}</p>
             ) : (
               <div className="space-y-3">
                 {dayWorkouts.map((workout) => (
                   <div key={workout.id} className="p-3 bg-white/50 rounded-xl border border-primary/10">
                     <p className="text-sm font-bold">{workout.title}</p>
-                    <p className="text-[10px] text-muted-foreground">{workout.exercises.length} exercises</p>
+                    <p className="text-[10px] text-muted-foreground">{workout.exercises.length} {t('exercises')}</p>
                   </div>
                 ))}
               </div>

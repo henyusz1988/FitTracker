@@ -3,6 +3,7 @@ import { Dumbbell, LogIn, AlertCircle, ExternalLink, RefreshCw } from "lucide-re
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { signInWithGoogle, signInWithGoogleRedirect, handleRedirectResult } from "../firebase";
+import { APP_NAME, BUILD_VERSION } from "../constants";
 import { motion, AnimatePresence } from "motion/react";
 
 export default function Login() {
@@ -95,7 +96,8 @@ export default function Login() {
               <Dumbbell className="text-white w-10 h-10" />
             </div>
             <div className="space-y-1">
-              <CardTitle className="text-3xl font-bold tracking-tight">FitTrack</CardTitle>
+              <CardTitle className="text-3xl font-bold tracking-tight">{APP_NAME}</CardTitle>
+              <p className="text-muted-foreground text-xs font-mono">Build v{BUILD_VERSION}</p>
               <p className="text-muted-foreground">Your personal fitness & health companion</p>
             </div>
           </CardHeader>

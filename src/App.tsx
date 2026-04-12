@@ -16,6 +16,7 @@ import {
   testConnection
 } from "@/src/services/firestore";
 import { auth, logout } from "@/src/firebase";
+import { APP_NAME, BUILD_VERSION } from "@/src/constants";
 import { onAuthStateChanged, User } from "firebase/auth";
 import WorkoutLog from "@/src/components/WorkoutLog";
 import DailyLog from "@/src/components/DailyLog";
@@ -167,7 +168,10 @@ export default function App() {
             <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/20">
               <Dumbbell className="text-white w-6 h-6" />
             </div>
-            <h1 className="text-2xl font-bold">FitTrack</h1>
+            <div>
+              <h1 className="text-2xl font-bold leading-none">{APP_NAME}</h1>
+              <span className="text-[10px] font-mono text-muted-foreground">v{BUILD_VERSION}</span>
+            </div>
           </div>
           <div className="flex gap-2">
             <Button 

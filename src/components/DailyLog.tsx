@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Save, X, Utensils, Scale, Plus, Trash2, Pill, Zap, Brain, Moon, Droplets } from "lucide-react";
+import { Save, X, Utensils, Scale, Plus, Trash2, Pill, Zap, Brain, Moon, Droplets, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
 import { WeightLog, MealLog, Meal, DailyMetrics, Supplement, Vitamin } from "@/src/types";
 import { motion, AnimatePresence } from "motion/react";
 
@@ -158,21 +157,24 @@ export default function DailyLog({ onSaveWeight, onSaveMeals, onSaveMetrics, onC
             <Brain className="w-5 h-5 text-red-500" />
             <CardTitle className="text-lg">Stress Level</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="flex justify-between text-xs font-bold text-muted-foreground">
-              <span>RELAXED</span>
-              <span>MODERATE</span>
-              <span>STRESSED</span>
+          <CardContent className="space-y-4">
+            <div className="relative">
+              <select
+                value={stress}
+                onChange={(e) => setStress(parseInt(e.target.value))}
+                className="w-full h-12 px-4 bg-background border rounded-xl appearance-none focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
+              >
+                {[...Array(10)].map((_, i) => (
+                  <option key={i + 1} value={i + 1}>
+                    {i + 1} - {i + 1 === 1 ? 'Very Relaxed' : i + 1 === 5 ? 'Moderate' : i + 1 === 10 ? 'Highly Stressed' : `Level ${i + 1}`}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
             </div>
-            <Slider
-              value={[stress]}
-              onValueChange={(val) => setStress(val[0])}
-              max={10}
-              min={1}
-              step={1}
-              className="py-4"
-            />
-            <p className="text-center font-bold text-2xl text-primary">{stress}/10</p>
+            <p className="text-center text-sm text-muted-foreground font-medium">
+              Current: <span className="text-primary font-bold">{stress}/10</span>
+            </p>
           </CardContent>
         </Card>
 
@@ -181,21 +183,24 @@ export default function DailyLog({ onSaveWeight, onSaveMeals, onSaveMetrics, onC
             <Moon className="w-5 h-5 text-indigo-500" />
             <CardTitle className="text-lg">Sleep Quality</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="flex justify-between text-xs font-bold text-muted-foreground">
-              <span>POOR</span>
-              <span>FAIR</span>
-              <span>GREAT</span>
+          <CardContent className="space-y-4">
+            <div className="relative">
+              <select
+                value={sleep}
+                onChange={(e) => setSleep(parseInt(e.target.value))}
+                className="w-full h-12 px-4 bg-background border rounded-xl appearance-none focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
+              >
+                {[...Array(10)].map((_, i) => (
+                  <option key={i + 1} value={i + 1}>
+                    {i + 1} - {i + 1 === 1 ? 'Very Poor' : i + 1 === 5 ? 'Fair' : i + 1 === 10 ? 'Excellent' : `Level ${i + 1}`}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
             </div>
-            <Slider
-              value={[sleep]}
-              onValueChange={(val) => setSleep(val[0])}
-              max={10}
-              min={1}
-              step={1}
-              className="py-4"
-            />
-            <p className="text-center font-bold text-2xl text-primary">{sleep}/10</p>
+            <p className="text-center text-sm text-muted-foreground font-medium">
+              Current: <span className="text-primary font-bold">{sleep}/10</span>
+            </p>
           </CardContent>
         </Card>
       </div>

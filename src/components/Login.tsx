@@ -41,12 +41,25 @@ export default function Login() {
     setLoading(true);
     setShowTroubleshooting(false);
     
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;
+    const isIos = /iPad|iPhone|iPod/.test(userAgent) && !(window as any).MSStream;
+    const isInstagram = userAgent.indexOf('Instagram') > -1;
+    const isFacebook = userAgent.indexOf('FBAN') > -1 || userAgent.indexOf('FBAV') > -1;
+    const isLine = userAgent.indexOf('Line') > -1;
+    const isMessenger = userAgent.indexOf('Messenger') > -1;
+    const isWebView = isInstagram || isFacebook || isLine || isMessenger;
     const isIframe = window.self !== window.top;
+
+    if (isIos && isWebView) {
+      setError("You are using an in-app browser (like Instagram or Facebook). Google blocks login in these for security. Please tap the '...' or share icon and select 'Open in Safari'.");
+      setLoading(false);
+      setShowTroubleshooting(true);
+      return;
+    }
 
     try {
       // If on mobile and NOT in an iframe, redirect is usually more reliable
-      if (isMobile && !isIframe) {
+      if (isIos && !isIframe) {
         await signInWithGoogleRedirect();
       } else {
         await signInWithGoogle();
@@ -54,7 +67,11 @@ export default function Login() {
     } catch (err: any) {
       console.error("Login failed", err);
       let message = "Login failed. Please try again.";
-      if (err.code === 'auth/unauthorized-domain') {
+      
+      // Handle specific Google Policy error
+      if (err.message?.includes("does not comply with google's policies") || err.code === 'auth/internal-error') {
+        message = "Google blocked this request. This usually happens if you're in a 'Private' tab, an in-app browser, or the domain isn't authorized. Try opening in Safari (not private mode).";
+      } else if (err.code === 'auth/unauthorized-domain') {
         message = "This domain is not authorized in Firebase. Please add your current URL to 'Authorized domains' in the Firebase Console.";
       } else if (err.code === 'auth/popup-closed-by-user') {
         message = "The login popup was closed before completion.";
@@ -63,8 +80,10 @@ export default function Login() {
       } else if (err.code === 'auth/popup-blocked') {
         message = "The login popup was blocked by your browser. Please allow popups for this site.";
       }
+      
       setError(message);
       setLoading(false);
+      setShowTroubleshooting(true);
     }
   };
 

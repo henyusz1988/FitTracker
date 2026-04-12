@@ -13,6 +13,7 @@ export interface Exercise {
 
 export interface Workout {
   id: string;
+  userId: string;
   date: string;
   title: string;
   exercises: Exercise[];
@@ -21,6 +22,7 @@ export interface Workout {
 
 export interface WeightLog {
   id: string;
+  userId: string;
   date: string;
   weight: number;
 }
@@ -34,6 +36,7 @@ export interface Meal {
 
 export interface MealLog {
   id: string;
+  userId: string;
   date: string;
   meals: Meal[];
 }
@@ -52,6 +55,7 @@ export interface Vitamin {
 
 export interface DailyMetrics {
   id: string;
+  userId: string;
   date: string;
   supplements: Supplement[];
   vitamins: Vitamin[];

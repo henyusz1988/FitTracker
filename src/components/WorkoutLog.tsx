@@ -81,6 +81,7 @@ export default function WorkoutLog({ onSave, onCancel, initialWorkout }: Workout
     if (!title.trim()) return;
     const workout: Workout = {
       id: initialWorkout?.id || Math.random().toString(36).substr(2, 9),
+      userId: "", // Will be set by App.tsx
       date: initialWorkout?.date || new Date().toISOString(),
       title,
       exercises,

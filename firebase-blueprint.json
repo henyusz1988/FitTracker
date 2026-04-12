@@ -1,0 +1,76 @@
+{
+  "entities": {
+    "Workout": {
+      "title": "Workout",
+      "description": "A recorded workout session",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "date": { "type": "string", "format": "date-time" },
+        "title": { "type": "string" },
+        "exercises": { "type": "array" },
+        "notes": { "type": "string" }
+      },
+      "required": ["id", "userId", "date", "title", "exercises"]
+    },
+    "WeightLog": {
+      "title": "WeightLog",
+      "description": "A daily body weight record",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "date": { "type": "string", "format": "date-time" },
+        "weight": { "type": "number" }
+      },
+      "required": ["id", "userId", "date", "weight"]
+    },
+    "MealLog": {
+      "title": "MealLog",
+      "description": "A daily nutrition record",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "date": { "type": "string", "format": "date-time" },
+        "meals": { "type": "array" }
+      },
+      "required": ["id", "userId", "date", "meals"]
+    },
+    "DailyMetrics": {
+      "title": "DailyMetrics",
+      "description": "Daily health metrics like stress, sleep, water",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "date": { "type": "string", "format": "date-time" },
+        "supplements": { "type": "array" },
+        "vitamins": { "type": "array" },
+        "stressLevel": { "type": "number" },
+        "sleepQuality": { "type": "number" },
+        "waterIntake": { "type": "number" }
+      },
+      "required": ["id", "userId", "date", "stressLevel", "sleepQuality", "waterIntake"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}/workouts/{workoutId}": {
+      "schema": "Workout",
+      "description": "User's workout sessions"
+    },
+    "/users/{userId}/weightLogs/{logId}": {
+      "schema": "WeightLog",
+      "description": "User's weight history"
+    },
+    "/users/{userId}/mealLogs/{logId}": {
+      "schema": "MealLog",
+      "description": "User's nutrition history"
+    },
+    "/users/{userId}/dailyMetrics/{metricId}": {
+      "schema": "DailyMetrics",
+      "description": "User's daily health metrics"
+    }
+  }
+}

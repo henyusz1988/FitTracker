@@ -59,6 +59,7 @@ export default function DailyLog({ onSaveWeight, onSaveMeals, onSaveMetrics, onC
     if (weight) {
       onSaveWeight({
         id: initialWeight?.id || Math.random().toString(36).substr(2, 9),
+        userId: "", // Will be set by App.tsx
         date,
         weight: parseFloat(weight),
       });
@@ -66,12 +67,14 @@ export default function DailyLog({ onSaveWeight, onSaveMeals, onSaveMetrics, onC
     
     onSaveMeals({
       id: initialMeals?.id || Math.random().toString(36).substr(2, 9),
+      userId: "", // Will be set by App.tsx
       date,
       meals,
     });
 
     onSaveMetrics({
       id: initialMetrics?.id || Math.random().toString(36).substr(2, 9),
+      userId: "", // Will be set by App.tsx
       date,
       supplements: supps,
       vitamins: vits,

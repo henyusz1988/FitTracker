@@ -23,12 +23,14 @@ import DailyLog from "@/src/components/DailyLog";
 import History from "@/src/components/History";
 import Dashboard from "@/src/components/Dashboard";
 import Login from "@/src/components/Login";
+import DateSelector from "@/src/components/DateSelector";
 import { ErrorBoundary } from "@/src/components/ErrorBoundary";
 import { motion, AnimatePresence } from "motion/react";
 
 export default function App() {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthReady, setIsAuthReady] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const [workouts, setWorkouts] = useState<Workout[]>([]);
   const [weightLogs, setWeightLogs] = useState<WeightLog[]>([]);
   const [mealLogs, setMealLogs] = useState<MealLog[]>([]);
@@ -142,10 +144,10 @@ export default function App() {
   }
 
   if (isLoggingDaily) {
-    const today = new Date().toISOString().split('T')[0];
-    const todayWeight = weightLogs.find(l => l.date.split('T')[0] === today);
-    const todayMeals = mealLogs.find(l => l.date.split('T')[0] === today);
-    const todayMetrics = metrics.find(m => m.date.split('T')[0] === today);
+    const dateStr = selectedDate.toISOString().split('T')[0];
+    const dayWeight = weightLogs.find(l => l.date.split('T')[0] === dateStr);
+    const dayMeals = mealLogs.find(l => l.date.split('T')[0] === dateStr);
+    const dayMetrics = metrics.find(m => m.date.split('T')[0] === dateStr);
 
     return (
       <ErrorBoundary>
@@ -155,9 +157,10 @@ export default function App() {
             onSaveMeals={handleSaveMeals}
             onSaveMetrics={handleSaveMetrics}
             onCancel={() => setIsLoggingDaily(false)}
-            initialWeight={todayWeight}
-            initialMeals={todayMeals}
-            initialMetrics={todayMetrics}
+            initialWeight={dayWeight}
+            initialMeals={dayMeals}
+            initialMetrics={dayMetrics}
+            selectedDate={selectedDate}
           />
         </div>
       </ErrorBoundary>
@@ -203,7 +206,7 @@ export default function App() {
         </header>
 
         <main className="px-6 max-w-2xl mx-auto">
-          <div className="mb-6 flex items-center gap-3 p-3 bg-primary/5 rounded-2xl">
+          <div className="mb-4 flex items-center gap-3 p-3 bg-primary/5 rounded-2xl">
             <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
               <UserIcon className="w-5 h-5 text-primary" />
             </div>
@@ -213,9 +216,17 @@ export default function App() {
             </div>
           </div>
 
+          <DateSelector selectedDate={selectedDate} onDateChange={setSelectedDate} />
+
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsContent value="dashboard" className="mt-0 focus-visible:ring-0">
-              <Dashboard workouts={workouts} weightLogs={weightLogs} mealLogs={mealLogs} metrics={metrics} />
+              <Dashboard 
+                workouts={workouts} 
+                weightLogs={weightLogs} 
+                mealLogs={mealLogs} 
+                metrics={metrics} 
+                selectedDate={selectedDate}
+              />
             </TabsContent>
             <TabsContent value="history" className="mt-0 focus-visible:ring-0">
               <History 

@@ -15,9 +15,10 @@ interface DailyLogProps {
   initialWeight?: WeightLog;
   initialMeals?: MealLog;
   initialMetrics?: DailyMetrics;
+  selectedDate: Date;
 }
 
-export default function DailyLog({ onSaveWeight, onSaveMeals, onSaveMetrics, onCancel, initialWeight, initialMeals, initialMetrics }: DailyLogProps) {
+export default function DailyLog({ onSaveWeight, onSaveMeals, onSaveMetrics, onCancel, initialWeight, initialMeals, initialMetrics, selectedDate }: DailyLogProps) {
   const [weight, setWeight] = useState<string>(initialWeight?.weight.toString() || "");
   const [meals, setMeals] = useState<Meal[]>(initialMeals?.meals || []);
   const [supps, setSupps] = useState<Supplement[]>(initialMetrics?.supplements || []);
@@ -25,7 +26,7 @@ export default function DailyLog({ onSaveWeight, onSaveMeals, onSaveMetrics, onC
   const [stress, setStress] = useState<number>(initialMetrics?.stressLevel || 5);
   const [sleep, setSleep] = useState<number>(initialMetrics?.sleepQuality || 7);
   const [water, setWater] = useState<string>(initialMetrics?.waterIntake?.toString() || "0");
-  const [date] = useState(new Date().toISOString());
+  const [date] = useState(selectedDate.toISOString());
 
   const addMeal = () => {
     const newMeal: Meal = {
@@ -88,7 +89,7 @@ export default function DailyLog({ onSaveWeight, onSaveMeals, onSaveMetrics, onC
       <div className="flex items-center justify-between sticky top-0 bg-background/80 backdrop-blur-sm z-10 py-4 border-b">
         <div>
           <h2 className="text-2xl font-bold">Daily Log</h2>
-          <p className="text-sm text-muted-foreground">{new Date().toLocaleDateString()}</p>
+          <p className="text-sm text-muted-foreground">{selectedDate.toLocaleDateString()}</p>
         </div>
         <div className="flex gap-2">
           <Button variant="ghost" size="icon" onClick={onCancel}>

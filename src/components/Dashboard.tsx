@@ -10,9 +10,10 @@ interface DashboardProps {
   weightLogs: WeightLog[];
   mealLogs: MealLog[];
   metrics: DailyMetrics[];
+  selectedDate: Date;
 }
 
-export default function Dashboard({ workouts, weightLogs, mealLogs, metrics }: DashboardProps) {
+export default function Dashboard({ workouts, weightLogs, mealLogs, metrics, selectedDate }: DashboardProps) {
   const [tip, setTip] = useState<string>("Loading your daily motivation...");
   const [loadingTip, setLoadingTip] = useState(true);
 
@@ -35,57 +36,45 @@ export default function Dashboard({ workouts, weightLogs, mealLogs, metrics }: D
     fetchTip();
   }, []);
 
-  const totalWorkouts = workouts.length;
+  const dateStr = selectedDate.toISOString().split('T')[0];
   
-  const totalVolume = workouts.reduce((acc, workout) => {
-    return acc + workout.exercises.reduce((exAcc, ex) => {
-      return exAcc + ex.sets.reduce((setAcc, set) => {
-        return setAcc + (set.weight * set.reps);
-      }, 0);
-    }, 0);
-  }, 0);
-
-  const totalExercises = workouts.reduce((acc, workout) => acc + workout.exercises.length, 0);
-
-  const latestWeight = weightLogs.length > 0 ? weightLogs[0].weight : null;
-  const weightDiff = weightLogs.length > 1 ? (weightLogs[0].weight - weightLogs[1].weight).toFixed(1) : null;
-
-  const today = new Date().toISOString().split('T')[0];
-  const todayMeals = mealLogs.find(l => l.date.split('T')[0] === today)?.meals || [];
-  const todayMetrics = metrics.find(m => m.date.split('T')[0] === today);
+  const dayWorkouts = workouts.filter(w => w.date.split('T')[0] === dateStr);
+  const dayWeight = weightLogs.find(l => l.date.split('T')[0] === dateStr);
+  const dayMeals = mealLogs.find(l => l.date.split('T')[0] === dateStr)?.meals || [];
+  const dayMetrics = metrics.find(m => m.date.split('T')[0] === dateStr);
 
   const stats = [
     {
       title: "Body Weight",
-      value: latestWeight ? `${latestWeight}kg` : "--",
+      value: dayWeight ? `${dayWeight.weight}kg` : "--",
       icon: Scale,
       color: "text-purple-500",
       bg: "bg-purple-50",
-      sub: weightDiff ? `${Number(weightDiff) > 0 ? '+' : ''}${weightDiff}kg` : "Latest"
+      sub: dayWeight ? "Recorded" : "No record"
     },
     {
       title: "Water Intake",
-      value: todayMetrics?.waterIntake ? `${todayMetrics.waterIntake}L` : "--",
+      value: dayMetrics?.waterIntake ? `${dayMetrics.waterIntake}L` : "--",
       icon: Droplets,
       color: "text-blue-500",
       bg: "bg-blue-50",
-      sub: "Today"
+      sub: "Daily"
     },
     {
       title: "Sleep Quality",
-      value: todayMetrics?.sleepQuality ? `${todayMetrics.sleepQuality}/10` : "--",
+      value: dayMetrics?.sleepQuality ? `${dayMetrics.sleepQuality}/10` : "--",
       icon: Moon,
       color: "text-indigo-500",
       bg: "bg-indigo-50",
-      sub: "Last night"
+      sub: "Quality"
     },
     {
       title: "Stress Level",
-      value: todayMetrics?.stressLevel ? `${todayMetrics.stressLevel}/10` : "--",
+      value: dayMetrics?.stressLevel ? `${dayMetrics.stressLevel}/10` : "--",
       icon: Brain,
       color: "text-red-500",
       bg: "bg-red-50",
-      sub: "Today"
+      sub: "Level"
     },
   ];
 
@@ -139,18 +128,18 @@ export default function Dashboard({ workouts, weightLogs, mealLogs, metrics }: D
           <CardHeader className="pb-2">
             <CardTitle className="text-lg flex items-center gap-2">
               <Utensils className="w-4 h-4" />
-              Today's Nutrition
+              Nutrition
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {todayMeals.length === 0 && (!todayMetrics?.supplements.length) && (!todayMetrics?.vitamins.length) ? (
-              <p className="text-sm text-muted-foreground italic py-4">No nutrition data logged today.</p>
+            {dayMeals.length === 0 && (!dayMetrics?.supplements.length) && (!dayMetrics?.vitamins.length) ? (
+              <p className="text-sm text-muted-foreground italic py-4">No nutrition data logged for this day.</p>
             ) : (
               <div className="space-y-4">
-                {todayMeals.length > 0 && (
+                {dayMeals.length > 0 && (
                   <div className="space-y-2">
                     <p className="text-[10px] font-bold uppercase text-muted-foreground">Meals</p>
-                    {todayMeals.map((meal) => (
+                    {dayMeals.map((meal) => (
                       <div key={meal.id} className="flex justify-between items-center border-b border-primary/10 pb-1 last:border-0">
                         <span className="text-sm font-medium">{meal.name}</span>
                         <span className="text-xs text-muted-foreground">{meal.amount}</span>
@@ -158,10 +147,10 @@ export default function Dashboard({ workouts, weightLogs, mealLogs, metrics }: D
                     ))}
                   </div>
                 )}
-                {todayMetrics?.supplements.length ? (
+                {dayMetrics?.supplements.length ? (
                   <div className="space-y-2">
                     <p className="text-[10px] font-bold uppercase text-muted-foreground">Supplements</p>
-                    {todayMetrics.supplements.map((s) => (
+                    {dayMetrics.supplements.map((s) => (
                       <div key={s.id} className="flex justify-between items-center border-b border-primary/10 pb-1 last:border-0">
                         <span className="text-sm font-medium">{s.name}</span>
                         <span className="text-xs text-muted-foreground">{s.amountGrams}g</span>
@@ -169,10 +158,10 @@ export default function Dashboard({ workouts, weightLogs, mealLogs, metrics }: D
                     ))}
                   </div>
                 ) : null}
-                {todayMetrics?.vitamins.length ? (
+                {dayMetrics?.vitamins.length ? (
                   <div className="space-y-2">
                     <p className="text-[10px] font-bold uppercase text-muted-foreground">Vitamins</p>
-                    {todayMetrics.vitamins.map((v) => (
+                    {dayMetrics.vitamins.map((v) => (
                       <div key={v.id} className="flex justify-between items-center border-b border-primary/10 pb-1 last:border-0">
                         <span className="text-sm font-medium">{v.name}</span>
                         <span className="text-xs text-muted-foreground">{v.amountMg}mg</span>
@@ -187,26 +176,24 @@ export default function Dashboard({ workouts, weightLogs, mealLogs, metrics }: D
 
         <Card className="border-none shadow-sm bg-primary/5">
           <CardHeader className="pb-2">
-            <CardTitle className="text-lg">Weekly Progress</CardTitle>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Activity className="w-4 h-4" />
+              Workouts
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="h-32 flex items-end justify-between gap-2 px-2">
-              {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((day, i) => {
-                const height = [40, 70, 30, 90, 50, 20, 10][i];
-                return (
-                  <div key={i} className="flex flex-col items-center gap-2 flex-1">
-                    <motion.div 
-                      initial={{ height: 0 }}
-                      animate={{ height: `${height}%` }}
-                      className="w-full bg-primary/20 rounded-t-md relative group"
-                    >
-                      <div className="absolute inset-0 bg-primary opacity-0 group-hover:opacity-100 transition-opacity rounded-t-md" />
-                    </motion.div>
-                    <span className="text-[10px] font-bold text-muted-foreground">{day}</span>
+            {dayWorkouts.length === 0 ? (
+              <p className="text-sm text-muted-foreground italic py-4">No workouts recorded for this day.</p>
+            ) : (
+              <div className="space-y-3">
+                {dayWorkouts.map((workout) => (
+                  <div key={workout.id} className="p-3 bg-white/50 rounded-xl border border-primary/10">
+                    <p className="text-sm font-bold">{workout.title}</p>
+                    <p className="text-[10px] text-muted-foreground">{workout.exercises.length} exercises</p>
                   </div>
-                );
-              })}
-            </div>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

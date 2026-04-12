@@ -50,32 +50,32 @@ export default function Dashboard({ workouts, weightLogs, mealLogs, metrics, sel
       title: t('body_weight'),
       value: dayWeight ? `${dayWeight.weight}kg` : "--",
       icon: Scale,
-      color: "text-purple-500",
-      bg: "bg-purple-50",
+      color: "text-purple-500 dark:text-purple-400",
+      bg: "bg-purple-100 dark:bg-purple-900/30",
       sub: dayWeight ? t('recorded') : t('no_record')
     },
     {
       title: t('water_intake'),
       value: dayMetrics?.waterIntake ? `${dayMetrics.waterIntake}L` : "--",
       icon: Droplets,
-      color: "text-blue-500",
-      bg: "bg-blue-50",
+      color: "text-blue-500 dark:text-blue-400",
+      bg: "bg-blue-100 dark:bg-blue-900/30",
       sub: t('daily')
     },
     {
       title: t('sleep_quality'),
       value: dayMetrics?.sleepQuality ? `${dayMetrics.sleepQuality}/10` : "--",
       icon: Moon,
-      color: "text-indigo-500",
-      bg: "bg-indigo-50",
+      color: "text-indigo-500 dark:text-indigo-400",
+      bg: "bg-indigo-100 dark:bg-indigo-900/30",
       sub: t('quality')
     },
     {
       title: t('stress_level'),
       value: dayMetrics?.stressLevel ? `${dayMetrics.stressLevel}/10` : "--",
       icon: Brain,
-      color: "text-red-500",
-      bg: "bg-red-50",
+      color: "text-red-500 dark:text-red-400",
+      bg: "bg-red-100 dark:bg-red-900/30",
       sub: t('level')
     },
   ];
@@ -126,10 +126,10 @@ export default function Dashboard({ workouts, weightLogs, mealLogs, metrics, sel
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card className="border-none shadow-sm bg-primary/5">
+        <Card className="border-none shadow-sm bg-muted/40 border border-border/50">
           <CardHeader className="pb-2">
             <CardTitle className="text-lg flex items-center gap-2">
-              <Utensils className="w-4 h-4" />
+              <Utensils className="w-4 h-4 text-primary" />
               {t('nutrition')}
             </CardTitle>
           </CardHeader>
@@ -142,7 +142,7 @@ export default function Dashboard({ workouts, weightLogs, mealLogs, metrics, sel
                   <div className="space-y-2">
                     <p className="text-[10px] font-bold uppercase text-muted-foreground">Meals</p>
                     {dayMeals.map((meal) => (
-                      <div key={meal.id} className="flex justify-between items-center border-b border-primary/10 pb-1 last:border-0">
+                      <div key={meal.id} className="flex justify-between items-center border-b border-border/30 pb-1 last:border-0">
                         <span className="text-sm font-medium">{meal.name}</span>
                         <span className="text-xs text-muted-foreground">{meal.amount}</span>
                       </div>
@@ -153,7 +153,7 @@ export default function Dashboard({ workouts, weightLogs, mealLogs, metrics, sel
                   <div className="space-y-2">
                     <p className="text-[10px] font-bold uppercase text-muted-foreground">Supplements</p>
                     {dayMetrics.supplements.map((s) => (
-                      <div key={s.id} className="flex justify-between items-center border-b border-primary/10 pb-1 last:border-0">
+                      <div key={s.id} className="flex justify-between items-center border-b border-border/30 pb-1 last:border-0">
                         <span className="text-sm font-medium">{s.name}</span>
                         <span className="text-xs text-muted-foreground">{s.amountGrams}g</span>
                       </div>
@@ -164,7 +164,7 @@ export default function Dashboard({ workouts, weightLogs, mealLogs, metrics, sel
                   <div className="space-y-2">
                     <p className="text-[10px] font-bold uppercase text-muted-foreground">Vitamins</p>
                     {dayMetrics.vitamins.map((v) => (
-                      <div key={v.id} className="flex justify-between items-center border-b border-primary/10 pb-1 last:border-0">
+                      <div key={v.id} className="flex justify-between items-center border-b border-border/30 pb-1 last:border-0">
                         <span className="text-sm font-medium">{v.name}</span>
                         <span className="text-xs text-muted-foreground">{v.amountMg}mg</span>
                       </div>
@@ -176,10 +176,10 @@ export default function Dashboard({ workouts, weightLogs, mealLogs, metrics, sel
           </CardContent>
         </Card>
 
-        <Card className="border-none shadow-sm bg-primary/5">
+        <Card className="border-none shadow-sm bg-muted/40 border border-border/50">
           <CardHeader className="pb-2">
             <CardTitle className="text-lg flex items-center gap-2">
-              <Activity className="w-4 h-4" />
+              <Activity className="w-4 h-4 text-primary" />
               {t('workouts')}
             </CardTitle>
           </CardHeader>
@@ -189,7 +189,7 @@ export default function Dashboard({ workouts, weightLogs, mealLogs, metrics, sel
             ) : (
               <div className="space-y-3">
                 {dayWorkouts.map((workout) => (
-                  <div key={workout.id} className="p-3 bg-white/50 rounded-xl border border-primary/10">
+                  <div key={workout.id} className="p-3 bg-background/60 rounded-xl border border-border/50 shadow-sm">
                     <p className="text-sm font-bold">{workout.title}</p>
                     <p className="text-[10px] text-muted-foreground">{workout.exercises.length} {t('exercises')}</p>
                   </div>

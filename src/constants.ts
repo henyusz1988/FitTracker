@@ -1,2 +1,2 @@
 export const APP_NAME = "GymBro beta";
-export const BUILD_VERSION = "0.8";
+export const BUILD_VERSION = "0.9";

@@ -235,8 +235,8 @@ export default function App() {
         </header>
 
         <main className="px-6 max-w-2xl mx-auto">
-          <div className="mb-4 flex items-center gap-3 p-3 bg-primary/5 rounded-2xl">
-            <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+          <div className="mb-4 flex items-center gap-3 p-3 bg-muted/50 rounded-2xl border border-border/50">
+            <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center shadow-inner">
               <UserIcon className="w-5 h-5 text-primary" />
             </div>
             <div>

@@ -15,38 +15,21 @@ service cloud.firestore {
       return val is string && val.size() <= maxLen;
     }
 
-    // Workouts
-    match /users/{userId}/workouts/{workoutId} {
-      allow read, delete: if isOwner(userId);
-      allow create, update: if isOwner(userId) && 
-        request.resource.data.userId == request.auth.uid &&
-        isValidString(request.resource.data.title, 100);
+    // Users collection
+    match /users/{uid} {
+      allow read: if isAuthenticated();
+      allow create: if isOwner(uid) && isValidString(request.resource.data.username, 50);
+      allow update: if false;
+      
+      // Subcollections (Workouts, Weight, Meals, Metrics)
+      match /{allSubcollections=**} {
+        allow read, write: if isOwner(uid);
+      }
     }
-
-    // Weight Logs
-    match /users/{userId}/weightLogs/{logId} {
-      allow read, delete: if isOwner(userId);
-      allow create, update: if isOwner(userId) && 
-        request.resource.data.userId == request.auth.uid &&
-        request.resource.data.weight is number;
-    }
-
-    // Meal Logs
-    match /users/{userId}/mealLogs/{logId} {
-      allow read, delete: if isOwner(userId);
-      allow create, update: if isOwner(userId) && 
-        request.resource.data.userId == request.auth.uid &&
-        request.resource.data.meals is list;
-    }
-
-    // Daily Metrics
-    match /users/{userId}/dailyMetrics/{metricId} {
-      allow read, delete: if isOwner(userId);
-      allow create, update: if isOwner(userId) && 
-        request.resource.data.userId == request.auth.uid &&
-        request.resource.data.stressLevel is number &&
-        request.resource.data.sleepQuality is number &&
-        request.resource.data.waterIntake is number;
+    
+    // Test connection path
+    match /test/connection {
+      allow read: if true;
     }
   }
 }

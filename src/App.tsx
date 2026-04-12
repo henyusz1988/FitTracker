@@ -15,9 +15,9 @@ import {
   subscribeDailyMetrics, saveDailyMetrics as fsSaveDailyMetrics,
   testConnection
 } from "@/src/services/firestore";
-import { auth, logout } from "@/src/firebase";
+import { auth, signOut, onAuthStateChanged } from "@/src/firebase";
 import { APP_NAME, BUILD_VERSION } from "@/src/constants";
-import { onAuthStateChanged, User } from "firebase/auth";
+import { User } from "firebase/auth";
 import WorkoutLog from "@/src/components/WorkoutLog";
 import DailyLog from "@/src/components/DailyLog";
 import History from "@/src/components/History";
@@ -68,6 +68,10 @@ export default function App() {
       unsubMetrics();
     };
   }, [user]);
+
+  const handleLogout = () => {
+    signOut(auth);
+  };
 
   const handleSaveWorkout = async (workout: Workout) => {
     if (!user) return;
@@ -189,7 +193,7 @@ export default function App() {
             </Button>
             <Button 
               variant="ghost"
-              onClick={logout}
+              onClick={handleLogout}
               className="rounded-full w-12 h-12 p-0 text-muted-foreground hover:text-destructive"
               title="Logout"
             >
@@ -200,16 +204,12 @@ export default function App() {
 
         <main className="px-6 max-w-2xl mx-auto">
           <div className="mb-6 flex items-center gap-3 p-3 bg-primary/5 rounded-2xl">
-            {user.photoURL ? (
-              <img src={user.photoURL} alt={user.displayName || ""} className="w-10 h-10 rounded-full border-2 border-primary/20" referrerPolicy="no-referrer" />
-            ) : (
-              <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-                <UserIcon className="w-5 h-5 text-primary" />
-              </div>
-            )}
+            <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+              <UserIcon className="w-5 h-5 text-primary" />
+            </div>
             <div>
               <p className="text-xs font-bold text-primary uppercase tracking-wider">Welcome back</p>
-              <p className="text-sm font-bold">{user.displayName || user.email}</p>
+              <p className="text-sm font-bold">{user.email?.split('@')[0]}</p>
             </div>
           </div>
 

@@ -3,11 +3,13 @@ import {
   doc, 
   setDoc, 
   getDocs, 
+  getDoc,
   query, 
   where, 
   deleteDoc,
   onSnapshot,
-  getDocFromServer
+  getDocFromServer,
+  serverTimestamp
 } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 import { Workout, WeightLog, MealLog, DailyMetrics } from '../types';
@@ -51,6 +53,23 @@ export async function testConnection() {
     }
   }
 }
+
+// User Management
+export const createUserProfile = async (uid: string, username: string) => {
+  const path = 'users';
+  try {
+    await setDoc(doc(db, path, uid), {
+      uid,
+      username: username.toLowerCase(),
+      displayName: username,
+      createdAt: serverTimestamp(),
+    });
+    return true;
+  } catch (error) {
+    handleFirestoreError(error, OperationType.WRITE, path);
+    return false;
+  }
+};
 
 // Workouts
 export const subscribeWorkouts = (userId: string, callback: (workouts: Workout[]) => void) => {

@@ -53,9 +53,24 @@
         "waterIntake": { "type": "number" }
       },
       "required": ["id", "userId", "date", "stressLevel", "sleepQuality", "waterIntake"]
+    },
+    "User": {
+      "title": "User",
+      "description": "A user profile",
+      "type": "object",
+      "properties": {
+        "username": { "type": "string" },
+        "displayName": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["username", "displayName"]
     }
   },
   "firestore": {
+    "/users/{username}": {
+      "schema": "User",
+      "description": "User profile document"
+    },
     "/users/{userId}/workouts/{workoutId}": {
       "schema": "Workout",
       "description": "User's workout sessions"

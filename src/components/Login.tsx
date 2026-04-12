@@ -1,99 +1,81 @@
-import React, { useState, useEffect } from "react";
-import { Dumbbell, LogIn, AlertCircle, ExternalLink, RefreshCw } from "lucide-react";
+import React, { useState } from "react";
+import { Dumbbell, LogIn, UserPlus, AlertCircle, RefreshCw, Eye, EyeOff, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { signInWithGoogle, signInWithGoogleRedirect, handleRedirectResult } from "../firebase";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { createUserProfile } from "../services/firestore";
+import { 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword, 
+  getEmailFromUsername,
+  auth
+} from "../firebase";
 import { APP_NAME, BUILD_VERSION } from "../constants";
 import { motion, AnimatePresence } from "motion/react";
 
 export default function Login() {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [showTroubleshooting, setShowTroubleshooting] = useState(false);
+  const [mode, setMode] = useState<"login" | "register">("login");
 
-  useEffect(() => {
-    // Check for redirect result on mount
-    const checkRedirect = async () => {
-      try {
-        const result = await handleRedirectResult();
-        if (result) {
-          console.log("Redirect sign-in successful");
-        }
-      } catch (err: any) {
-        console.error("Redirect error", err);
-        setError("Redirect sign-in failed. Please try again.");
-      }
-    };
-    checkRedirect();
-
-    // Show troubleshooting after 10 seconds of loading
-    let timer: NodeJS.Timeout;
-    if (loading) {
-      timer = setTimeout(() => {
-        setShowTroubleshooting(true);
-      }, 10000);
-    }
-    return () => clearTimeout(timer);
-  }, [loading]);
-
-  const handleLogin = async () => {
-    setError(null);
-    setLoading(true);
-    setShowTroubleshooting(false);
-    
-    const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;
-    const isIos = /iPad|iPhone|iPod/.test(userAgent) && !(window as any).MSStream;
-    const isInstagram = userAgent.indexOf('Instagram') > -1;
-    const isFacebook = userAgent.indexOf('FBAN') > -1 || userAgent.indexOf('FBAV') > -1;
-    const isLine = userAgent.indexOf('Line') > -1;
-    const isMessenger = userAgent.indexOf('Messenger') > -1;
-    const isWebView = isInstagram || isFacebook || isLine || isMessenger;
-    const isIframe = window.self !== window.top;
-
-    if (isIos && isWebView) {
-      setError("You are using an in-app browser (like Instagram or Facebook). Google blocks login in these for security. Please tap the '...' or share icon and select 'Open in Safari'.");
-      setLoading(false);
-      setShowTroubleshooting(true);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!username.trim() || !password.trim()) {
+      setError("Please enter both username and password");
       return;
     }
 
+    // Basic validation: alphanumeric only, 3-15 chars for username
+    const usernameRegex = /^[a-zA-Z0-9_]{3,15}$/;
+    if (!usernameRegex.test(username)) {
+      setError("Username must be 3-15 characters and only contain letters, numbers, or underscores");
+      return;
+    }
+
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters");
+      return;
+    }
+
+    setError(null);
+    setLoading(true);
+
+    const email = getEmailFromUsername(username);
+
     try {
-      // If on mobile and NOT in an iframe, redirect is usually more reliable
-      if (isIos && !isIframe) {
-        await signInWithGoogleRedirect();
+      if (mode === "login") {
+        await signInWithEmailAndPassword(auth, email, password);
       } else {
-        await signInWithGoogle();
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        await createUserProfile(userCredential.user.uid, username);
       }
     } catch (err: any) {
-      console.error("Login failed", err);
-      let message = "Login failed. Please try again.";
+      console.error("Auth error", err);
+      let message = "Authentication failed. Please check your credentials.";
       
-      // Handle specific Google Policy error
-      if (err.message?.includes("does not comply with google's policies") || err.code === 'auth/internal-error') {
-        message = "Google blocked this request. This usually happens if you're in a 'Private' tab, an in-app browser, or the domain isn't authorized. Try opening in Safari (not private mode).";
-      } else if (err.code === 'auth/unauthorized-domain') {
-        message = "This domain is not authorized in Firebase. Please add your current URL to 'Authorized domains' in the Firebase Console.";
-      } else if (err.code === 'auth/popup-closed-by-user') {
-        message = "The login popup was closed before completion.";
-      } else if (err.code === 'auth/cancelled-popup-request') {
-        message = "Login request was cancelled.";
-      } else if (err.code === 'auth/popup-blocked') {
-        message = "The login popup was blocked by your browser. Please allow popups for this site.";
+      if (err.code === 'auth/user-not-found') {
+        message = "User not found. Would you like to create a new account?";
+        setMode("register");
+      } else if (err.code === 'auth/wrong-password') {
+        message = "Incorrect password. Please try again.";
+      } else if (err.code === 'auth/email-already-in-use') {
+        message = "Username already taken. Please choose another.";
+      } else if (err.code === 'auth/weak-password') {
+        message = "Password is too weak. Please use at least 6 characters.";
+      } else if (err.code === 'auth/invalid-credential') {
+        message = "Invalid username or password.";
+      } else if (err.code === 'auth/operation-not-allowed') {
+        message = "Email/Password login is not enabled in the Firebase Console. Please enable it in the Auth section.";
+      } else if (err.message?.includes('PERMISSION_DENIED')) {
+        message = "Account created, but failed to set up your profile. Please try logging in.";
       }
       
       setError(message);
-      setLoading(false);
-      setShowTroubleshooting(true);
-    }
-  };
-
-  const handleRedirectLogin = async () => {
-    setError(null);
-    setLoading(true);
-    try {
-      await signInWithGoogleRedirect();
-    } catch (err: any) {
-      setError("Redirect failed. Please try the standard login or open in a new tab.");
+    } finally {
       setLoading(false);
     }
   };
@@ -120,14 +102,14 @@ export default function Login() {
               <p className="text-muted-foreground">Your personal fitness & health companion</p>
             </div>
           </CardHeader>
-          <CardContent className="p-8 space-y-8">
-            <AnimatePresence>
+          <CardContent className="p-8 space-y-6">
+            <AnimatePresence mode="wait">
               {error && (
                 <motion.div
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: "auto" }}
                   exit={{ opacity: 0, height: 0 }}
-                  className="bg-destructive/10 border border-destructive/20 rounded-lg p-3 flex items-start gap-3 text-destructive text-sm mb-4"
+                  className="bg-destructive/10 border border-destructive/20 rounded-lg p-3 flex items-start gap-3 text-destructive text-sm"
                 >
                   <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
                   <p>{error}</p>
@@ -135,72 +117,86 @@ export default function Login() {
               )}
             </AnimatePresence>
 
-            <div className="space-y-4">
-              <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">1</div>
-                <p>Track workouts, weight, and nutrition</p>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="username">Username</Label>
+                <Input
+                  id="username"
+                  placeholder="e.g. gym_bro_99"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  className="h-12 text-lg rounded-xl"
+                  autoComplete="username"
+                  disabled={loading}
+                />
               </div>
-              <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">2</div>
-                <p>Monitor stress, sleep, and hydration</p>
-              </div>
-              <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">3</div>
-                <p>Sync your data across all devices</p>
-              </div>
-            </div>
 
-            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="password">Password</Label>
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="h-12 text-lg rounded-xl pr-10"
+                    autoComplete={mode === "login" ? "current-password" : "new-password"}
+                    disabled={loading}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
+                </div>
+              </div>
+
               <Button 
-                onClick={handleLogin}
+                type="submit"
                 disabled={loading}
                 className="w-full h-14 text-lg font-semibold rounded-xl shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
               >
                 {loading ? (
                   <RefreshCw className="w-5 h-5 mr-2 animate-spin" />
-                ) : (
+                ) : mode === "login" ? (
                   <LogIn className="w-5 h-5 mr-2" />
+                ) : (
+                  <UserPlus className="w-5 h-5 mr-2" />
                 )}
-                {loading ? "Signing in..." : "Sign in with Google"}
+                {loading ? "Processing..." : mode === "login" ? "Sign In" : "Create Account"}
               </Button>
+            </form>
 
-              <AnimatePresence>
-                {showTroubleshooting && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="p-4 bg-muted/50 rounded-xl space-y-3 border border-border"
-                  >
-                    <p className="text-xs font-medium text-muted-foreground text-center">
-                      Still loading? Mobile browsers sometimes block sign-in popups.
-                    </p>
-                    <div className="grid grid-cols-1 gap-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={handleRedirectLogin}
-                        className="text-xs h-10"
-                      >
-                        Try Redirect Method
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={() => window.open(window.location.href, '_blank')}
-                        className="text-xs h-10"
-                      >
-                        <ExternalLink className="w-3 h-3 mr-2" />
-                        Open in New Tab
-                      </Button>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+            <div className="text-center">
+              <button
+                type="button"
+                onClick={() => setMode(mode === "login" ? "register" : "login")}
+                className="text-sm text-primary font-medium hover:underline"
+                disabled={loading}
+              >
+                {mode === "login" ? "Need a new account? Register here" : "Already have an account? Sign in"}
+              </button>
             </div>
             
-            <p className="text-center text-xs text-muted-foreground px-4">
-              By signing in, you agree to our Terms of Service and Privacy Policy.
-            </p>
+            <div className="pt-4 border-t border-border/50">
+              <div className="flex items-center justify-center gap-2 text-[10px] text-muted-foreground uppercase tracking-widest font-bold mb-4">
+                <Lock className="w-3 h-3" />
+                Secure Login
+              </div>
+              <div className="space-y-2">
+                <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                  <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">1</div>
+                  <p>Choose a unique username</p>
+                </div>
+                <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                  <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">2</div>
+                  <p>Set a secure password</p>
+                </div>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </motion.div>

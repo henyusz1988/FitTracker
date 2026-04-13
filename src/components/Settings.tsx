@@ -1,18 +1,22 @@
 import React, { useState } from "react";
-import { Settings as SettingsIcon, ChevronUp, ChevronDown, Save, X, Layout } from "lucide-react";
+import { Settings as SettingsIcon, ChevronUp, ChevronDown, Save, X, Layout, User as UserIcon, LogOut, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useTranslation } from "react-i18next";
-import { motion, AnimatePresence } from "motion/react";
+import { motion } from "motion/react";
 import { UserConfig } from "../types";
+import { User } from "firebase/auth";
+import LanguageSelector from "./LanguageSelector";
 
 interface SettingsProps {
   config: UserConfig | null;
+  user: User | null;
   onSave: (config: UserConfig) => void;
   onClose: () => void;
+  onLogout: () => void;
 }
 
-export default function Settings({ config, onSave, onClose }: SettingsProps) {
+export default function Settings({ config, user, onSave, onClose, onLogout }: SettingsProps) {
   const { t } = useTranslation();
   const defaultOrder = ['weight', 'water', 'sleep', 'stress'];
   const [order, setOrder] = useState<string[]>(config?.statOrder || defaultOrder);
@@ -61,7 +65,29 @@ export default function Settings({ config, onSave, onClose }: SettingsProps) {
             <X className="w-5 h-5" />
           </Button>
         </CardHeader>
-        <CardContent className="p-6 space-y-6">
+        <CardContent className="p-6 space-y-6 max-h-[80vh] overflow-y-auto">
+          {/* User Info */}
+          <div className="flex items-center gap-3 p-3 bg-primary/5 rounded-2xl border border-primary/10">
+            <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+              <UserIcon className="w-5 h-5 text-primary" />
+            </div>
+            <div className="overflow-hidden">
+              <p className="text-[10px] font-bold text-primary uppercase tracking-wider leading-none mb-1">Account</p>
+              <p className="text-sm font-bold truncate">{user?.email}</p>
+            </div>
+          </div>
+
+          {/* Language Selection */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 text-sm font-bold text-primary uppercase tracking-wider">
+              <Globe className="w-4 h-4" />
+              Language
+            </div>
+            <div className="flex justify-center p-2 bg-muted/30 rounded-xl border border-border/50">
+              <LanguageSelector />
+            </div>
+          </div>
+
           <div className="space-y-4">
             <div className="flex items-center gap-2 text-sm font-bold text-primary uppercase tracking-wider">
               <Layout className="w-4 h-4" />
@@ -103,13 +129,24 @@ export default function Settings({ config, onSave, onClose }: SettingsProps) {
             </div>
           </div>
 
-          <div className="pt-4 flex gap-3">
-            <Button variant="outline" onClick={onClose} className="flex-1 rounded-xl">
-              {t('close')}
-            </Button>
-            <Button onClick={handleSave} className="flex-1 rounded-xl shadow-lg shadow-primary/20">
-              <Save className="w-4 h-4 mr-2" />
-              {t('save_changes')}
+          <div className="pt-4 flex flex-col gap-3">
+            <div className="flex gap-3">
+              <Button variant="outline" onClick={onClose} className="flex-1 rounded-xl">
+                {t('close')}
+              </Button>
+              <Button onClick={handleSave} className="flex-1 rounded-xl shadow-lg shadow-primary/20">
+                <Save className="w-4 h-4 mr-2" />
+                {t('save_changes')}
+              </Button>
+            </div>
+            
+            <Button 
+              variant="ghost" 
+              onClick={onLogout} 
+              className="w-full rounded-xl text-destructive hover:text-destructive hover:bg-destructive/10"
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              {t('logout')}
             </Button>
           </div>
         </CardContent>

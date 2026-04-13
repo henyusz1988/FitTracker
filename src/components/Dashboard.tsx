@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Activity, Scale, Utensils, Brain, Moon, Droplets, ChartLine } from "lucide-react";
+import { Activity, Scale, Utensils, Brain, Moon, Droplets, ChartLine, Pencil } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Workout, WeightLog, MealLog, DailyMetrics, UserConfig } from "@/src/types";
@@ -14,9 +14,10 @@ interface DashboardProps {
   metrics: DailyMetrics[];
   selectedDate: Date;
   config: UserConfig | null;
+  onEdit: () => void;
 }
 
-export default function Dashboard({ workouts, weightLogs, mealLogs, metrics, selectedDate, config }: DashboardProps) {
+export default function Dashboard({ workouts, weightLogs, mealLogs, metrics, selectedDate, config, onEdit }: DashboardProps) {
   const { t } = useTranslation();
   const [activeChart, setActiveChart] = useState<{ title: string; data: { date: string; value: number }[]; unit?: string; color?: string } | null>(null);
 
@@ -107,14 +108,24 @@ export default function Dashboard({ workouts, weightLogs, mealLogs, metrics, sel
           >
             <Card className="border-none shadow-sm overflow-hidden relative group">
               <CardContent className="p-4 flex flex-col items-center text-center space-y-2">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="absolute top-1 right-1 h-7 w-7 rounded-full opacity-0 group-hover:opacity-100 transition-opacity bg-background/50 backdrop-blur-sm shadow-sm"
-                  onClick={() => setActiveChart({ title: stat.title, data: stat.chartData, unit: stat.unit, color: stat.chartColor })}
-                >
-                  <ChartLine className="w-3.5 h-3.5 text-primary" />
-                </Button>
+                <div className="absolute top-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7 rounded-full bg-background/50 backdrop-blur-sm shadow-sm"
+                    onClick={() => setActiveChart({ title: stat.title, data: stat.chartData, unit: stat.unit, color: stat.chartColor })}
+                  >
+                    <ChartLine className="w-3.5 h-3.5 text-primary" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7 rounded-full bg-background/50 backdrop-blur-sm shadow-sm"
+                    onClick={onEdit}
+                  >
+                    <Pencil className="w-3.5 h-3.5 text-primary" />
+                  </Button>
+                </div>
                 <div className={`p-2 rounded-full ${stat.bg}`}>
                   <stat.icon className={`w-5 h-5 ${stat.color}`} />
                 </div>

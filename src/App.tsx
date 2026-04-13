@@ -214,8 +214,10 @@ export default function App() {
           {isSettingsOpen && (
             <Settings 
               config={userConfig} 
+              user={user}
               onSave={handleSaveConfig} 
               onClose={() => setIsSettingsOpen(false)} 
+              onLogout={handleLogout}
             />
           )}
         </AnimatePresence>
@@ -246,7 +248,6 @@ export default function App() {
             >
               <Plus className="w-6 h-6" />
             </Button>
-            <LanguageSelector />
             <Button 
               variant="ghost"
               onClick={() => setIsSettingsOpen(true)}
@@ -255,28 +256,10 @@ export default function App() {
             >
               <SettingsIcon className="w-5 h-5" />
             </Button>
-            <Button 
-              variant="ghost"
-              onClick={handleLogout}
-              className="rounded-full w-12 h-12 p-0 text-muted-foreground hover:text-destructive"
-              title={t('logout')}
-            >
-              <LogOut className="w-5 h-5" />
-            </Button>
           </div>
         </header>
 
         <main className="px-6 max-w-2xl mx-auto">
-          <div className="mb-4 flex items-center gap-3 p-3 bg-muted/50 rounded-2xl border border-border/50">
-            <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center shadow-inner">
-              <UserIcon className="w-5 h-5 text-primary" />
-            </div>
-            <div>
-              <p className="text-xs font-bold text-primary uppercase tracking-wider">{t('welcome_back')}</p>
-              <p className="text-sm font-bold">{user.email?.split('@')[0]}</p>
-            </div>
-          </div>
-
           <DateSelector selectedDate={selectedDate} onDateChange={setSelectedDate} />
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -288,6 +271,7 @@ export default function App() {
                 metrics={metrics} 
                 selectedDate={selectedDate}
                 config={userConfig}
+                onEdit={() => setIsLoggingDaily(true)}
               />
             </TabsContent>
             <TabsContent value="history" className="mt-0 focus-visible:ring-0">

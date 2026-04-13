@@ -27,8 +27,8 @@ export const exportToExcel = (
       Date: date,
       'Weight (kg)': dayWeight?.weight || '',
       'Water (L)': dayMetrics?.waterIntake || '',
-      'Sleep Quality (1-10)': dayMetrics?.sleepQuality || '',
-      'Stress Level (1-10)': dayMetrics?.stressLevel || '',
+      'Sleep Quality (1-5)': dayMetrics?.sleepQuality || '',
+      'Stress Level (1-5)': dayMetrics?.stressLevel || '',
       'Workouts Done': dayWorkouts.map(w => w.title).join(', '),
       'Meals Logged': dayMeals?.meals.length || 0,
       'Supplements': dayMetrics?.supplements.map(s => `${s.name} (${s.amountGrams}g)`).join(', ') || '',
@@ -68,7 +68,7 @@ export const exportToExcel = (
     l.meals.map(m => ({
       Date: new Date(l.date).toLocaleDateString(),
       Food: m.name,
-      Amount: m.amount
+      'Amount (g)': m.amountGrams
     }))
   );
   const wsNutrition = XLSX.utils.json_to_sheet(nutritionData);

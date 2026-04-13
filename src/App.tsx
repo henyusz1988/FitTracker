@@ -172,11 +172,13 @@ export default function App() {
         <div className="min-h-screen bg-background p-4 md:p-8">
           <WorkoutLog
             onSave={handleSaveWorkout}
+            onSaveConfig={handleSaveConfig}
             onCancel={() => {
               setIsLogging(false);
               setEditingWorkout(null);
             }}
             initialWorkout={editingWorkout || undefined}
+            config={userConfig}
           />
         </div>
       </ErrorBoundary>
@@ -196,10 +198,12 @@ export default function App() {
             onSaveWeight={handleSaveWeight}
             onSaveMeals={handleSaveMeals}
             onSaveMetrics={handleSaveMetrics}
+            onSaveConfig={handleSaveConfig}
             onCancel={() => setIsLoggingDaily(false)}
             initialWeight={dayWeight}
             initialMeals={dayMeals}
             initialMetrics={dayMetrics}
+            config={userConfig}
             selectedDate={selectedDate}
           />
         </div>

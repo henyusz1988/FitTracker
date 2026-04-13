@@ -34,10 +34,12 @@ export default function Dashboard({ workouts, weightLogs, mealLogs, metrics, sel
       id: 'weight',
       title: t('body_weight'),
       value: dayWeight ? `${dayWeight.weight}kg` : "--",
+      currentValue: dayWeight?.weight || 0,
+      target: config?.targetWeight,
       icon: Scale,
       color: "text-purple-500 dark:text-purple-400",
       bg: "bg-purple-100 dark:bg-purple-900/30",
-      sub: dayWeight ? t('recorded') : t('no_record'),
+      sub: config?.targetWeight ? `${t('target')}: ${config.targetWeight}kg` : (dayWeight ? t('recorded') : t('no_record')),
       chartData: weightLogs.map(l => ({ date: l.date, value: l.weight })),
       unit: "kg",
       chartColor: "#a855f7"
@@ -46,10 +48,12 @@ export default function Dashboard({ workouts, weightLogs, mealLogs, metrics, sel
       id: 'water',
       title: t('water_intake'),
       value: dayMetrics?.waterIntake ? `${dayMetrics.waterIntake}L` : "--",
+      currentValue: dayMetrics?.waterIntake || 0,
+      target: config?.targetWater,
       icon: Droplets,
       color: "text-blue-500 dark:text-blue-400",
       bg: "bg-blue-100 dark:bg-blue-900/30",
-      sub: t('daily'),
+      sub: config?.targetWater ? `${t('target')}: ${config.targetWater}L` : t('daily'),
       chartData: metrics.filter(m => m.waterIntake !== undefined).map(m => ({ date: m.date, value: m.waterIntake! })),
       unit: "L",
       chartColor: "#3b82f6"
@@ -57,25 +61,25 @@ export default function Dashboard({ workouts, weightLogs, mealLogs, metrics, sel
     {
       id: 'sleep',
       title: t('sleep_quality'),
-      value: dayMetrics?.sleepQuality ? `${dayMetrics.sleepQuality}/10` : "--",
+      value: dayMetrics?.sleepQuality ? `${dayMetrics.sleepQuality}/5` : "--",
       icon: Moon,
       color: "text-indigo-500 dark:text-indigo-400",
       bg: "bg-indigo-100 dark:bg-indigo-900/30",
       sub: t('quality'),
       chartData: metrics.filter(m => m.sleepQuality !== undefined).map(m => ({ date: m.date, value: m.sleepQuality! })),
-      unit: "/10",
+      unit: "/5",
       chartColor: "#6366f1"
     },
     {
       id: 'stress',
       title: t('stress_level'),
-      value: dayMetrics?.stressLevel ? `${dayMetrics.stressLevel}/10` : "--",
+      value: dayMetrics?.stressLevel ? `${dayMetrics.stressLevel}/5` : "--",
       icon: Brain,
       color: "text-red-500 dark:text-red-400",
       bg: "bg-red-100 dark:bg-red-900/30",
       sub: t('level'),
       chartData: metrics.filter(m => m.stressLevel !== undefined).map(m => ({ date: m.date, value: m.stressLevel! })),
-      unit: "/10",
+      unit: "/5",
       chartColor: "#ef4444"
     },
   ];
@@ -130,11 +134,19 @@ export default function Dashboard({ workouts, weightLogs, mealLogs, metrics, sel
                 <div className={`p-2 rounded-full ${stat.bg}`}>
                   <stat.icon className={`w-5 h-5 ${stat.color}`} />
                 </div>
-                <div className="space-y-0.5">
+                <div className="space-y-0.5 w-full">
                   <p className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">
                     {stat.title}
                   </p>
                   <p className="text-xl font-bold">{stat.value}</p>
+                  {stat.target && stat.id !== 'weight' && (
+                    <div className="w-full h-1 bg-muted rounded-full mt-1 overflow-hidden">
+                      <div 
+                        className={`h-full ${stat.color.replace('text-', 'bg-')}`} 
+                        style={{ width: `${Math.min(100, (stat.currentValue / stat.target) * 100)}%` }}
+                      />
+                    </div>
+                  )}
                   <p className="text-[10px] text-muted-foreground font-medium">{stat.sub}</p>
                 </div>
               </CardContent>
@@ -170,7 +182,7 @@ export default function Dashboard({ workouts, weightLogs, mealLogs, metrics, sel
                     {dayMeals.map((meal) => (
                       <div key={meal.id} className="flex justify-between items-center border-b border-border/30 pb-1 last:border-0">
                         <span className="text-sm font-medium">{meal.name}</span>
-                        <span className="text-xs text-muted-foreground">{meal.amount}</span>
+                        <span className="text-xs text-muted-foreground">{meal.amountGrams}g</span>
                       </div>
                     ))}
                   </div>
@@ -178,23 +190,43 @@ export default function Dashboard({ workouts, weightLogs, mealLogs, metrics, sel
                 {dayMetrics?.supplements.length ? (
                   <div className="space-y-2">
                     <p className="text-[10px] font-bold uppercase text-muted-foreground">Supplements</p>
-                    {dayMetrics.supplements.map((s) => (
-                      <div key={s.id} className="flex justify-between items-center border-b border-border/30 pb-1 last:border-0">
-                        <span className="text-sm font-medium">{s.name}</span>
-                        <span className="text-xs text-muted-foreground">{s.amountGrams}g</span>
-                      </div>
-                    ))}
+                    {dayMetrics.supplements.map((s) => {
+                      const target = config?.supplementTargets?.find(st => st.name.toLowerCase() === s.name.toLowerCase());
+                      return (
+                        <div key={s.id} className="space-y-1">
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm font-medium">{s.name}</span>
+                            <span className="text-xs text-muted-foreground">{s.amountGrams}g {target ? `/ ${target.targetGrams}g` : ''}</span>
+                          </div>
+                          {target && (
+                            <div className="w-full h-1 bg-muted rounded-full overflow-hidden">
+                              <div className="h-full bg-primary" style={{ width: `${Math.min(100, (s.amountGrams / target.targetGrams) * 100)}%` }} />
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 ) : null}
                 {dayMetrics?.vitamins.length ? (
                   <div className="space-y-2">
                     <p className="text-[10px] font-bold uppercase text-muted-foreground">Vitamins</p>
-                    {dayMetrics.vitamins.map((v) => (
-                      <div key={v.id} className="flex justify-between items-center border-b border-border/30 pb-1 last:border-0">
-                        <span className="text-sm font-medium">{v.name}</span>
-                        <span className="text-xs text-muted-foreground">{v.amountMg}mg</span>
-                      </div>
-                    ))}
+                    {dayMetrics.vitamins.map((v) => {
+                      const target = config?.vitaminTargets?.find(vt => vt.name.toLowerCase() === v.name.toLowerCase());
+                      return (
+                        <div key={v.id} className="space-y-1">
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm font-medium">{v.name}</span>
+                            <span className="text-xs text-muted-foreground">{v.amountMg}mg {target ? `/ ${target.targetMg}mg` : ''}</span>
+                          </div>
+                          {target && (
+                            <div className="w-full h-1 bg-muted rounded-full overflow-hidden">
+                              <div className="h-full bg-primary" style={{ width: `${Math.min(100, (v.amountMg / target.targetMg) * 100)}%` }} />
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 ) : null}
               </div>
@@ -214,22 +246,52 @@ export default function Dashboard({ workouts, weightLogs, mealLogs, metrics, sel
               <p className="text-sm text-muted-foreground italic py-4">{t('no_workouts_data')}</p>
             ) : (
               <div className="space-y-3">
-                {dayWorkouts.map((workout) => (
-                  <div key={workout.id} className="p-3 bg-background/60 rounded-xl border border-border/50 shadow-sm flex items-center justify-between group/workout">
-                    <div>
-                      <p className="text-sm font-bold">{workout.title}</p>
-                      <p className="text-[10px] text-muted-foreground">{workout.exercises.length} {t('exercises')}</p>
+                {dayWorkouts.map((workout) => {
+                  const exercisesWithTargets = workout.exercises.filter(e => 
+                    config?.exerciseTargets?.some(t => t.name.toLowerCase() === e.name.toLowerCase())
+                  );
+                  
+                  return (
+                    <div key={workout.id} className="p-3 bg-background/60 rounded-xl border border-border/50 shadow-sm flex flex-col gap-2 group/workout">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-bold">{workout.title}</p>
+                          <p className="text-[10px] text-muted-foreground">{workout.exercises.length} {t('exercises')}</p>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 rounded-full opacity-0 group-hover/workout:opacity-100 transition-opacity"
+                          onClick={() => onEditWorkout(workout)}
+                        >
+                          <Pencil className="w-3.5 h-3.5 text-primary" />
+                        </Button>
+                      </div>
+                      
+                      {exercisesWithTargets.length > 0 && (
+                        <div className="space-y-1 pt-1 border-t border-border/30">
+                          {exercisesWithTargets.map(ex => {
+                            const target = config?.exerciseTargets?.find(t => t.name.toLowerCase() === ex.name.toLowerCase());
+                            const bestSet = ex.sets.reduce((prev, curr) => (curr.weight > prev.weight ? curr : prev), ex.sets[0]);
+                            const progress = target ? Math.min(100, (bestSet.weight / target.targetWeight) * 100) : 0;
+                            
+                            return (
+                              <div key={ex.id} className="space-y-1">
+                                <div className="flex justify-between items-center text-[9px] font-bold uppercase">
+                                  <span className="text-muted-foreground truncate max-w-[100px]">{ex.name}</span>
+                                  <span className="text-primary">{bestSet.weight}kg / {target?.targetWeight}kg</span>
+                                </div>
+                                <div className="w-full h-0.5 bg-muted rounded-full overflow-hidden">
+                                  <div className="h-full bg-primary" style={{ width: `${progress}%` }} />
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 rounded-full opacity-0 group-hover/workout:opacity-100 transition-opacity"
-                      onClick={() => onEditWorkout(workout)}
-                    >
-                      <Pencil className="w-3.5 h-3.5 text-primary" />
-                    </Button>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </CardContent>

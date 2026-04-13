@@ -67,7 +67,8 @@ const resources = {
       "reorder_stats": "Reorder Dashboard Stats",
       "move_up": "Move Up",
       "move_down": "Move Down",
-      "save_changes": "Save Changes"
+      "save_changes": "Save Changes",
+      "target": "Target"
     }
   },
   hu: {
@@ -134,7 +135,8 @@ const resources = {
       "reorder_stats": "Irányítópult statisztikák sorrendje",
       "move_up": "Mozgatás fel",
       "move_down": "Mozgatás le",
-      "save_changes": "Módosítások mentése"
+      "save_changes": "Módosítások mentése",
+      "target": "Cél"
     }
   }
 };

@@ -6,18 +6,22 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Workout, Exercise, Set } from "@/src/types";
+import { Workout, Exercise, Set, UserConfig } from "@/src/types";
 import { motion, AnimatePresence } from "motion/react";
+import { Trophy } from "lucide-react";
 
 interface WorkoutLogProps {
   onSave: (workout: Workout) => void;
+  onSaveConfig: (config: UserConfig) => void;
   onCancel: () => void;
   initialWorkout?: Workout;
+  config: UserConfig | null;
 }
 
-export default function WorkoutLog({ onSave, onCancel, initialWorkout }: WorkoutLogProps) {
+export default function WorkoutLog({ onSave, onSaveConfig, onCancel, initialWorkout, config }: WorkoutLogProps) {
   const [title, setTitle] = useState(initialWorkout?.title || "New Workout");
   const [exercises, setExercises] = useState<Exercise[]>(initialWorkout?.exercises || []);
+  const [exTargets, setExTargets] = useState<{ name: string; targetWeight: number; targetReps: number }[]>(config?.exerciseTargets || []);
 
   const addExercise = () => {
     const newExercise: Exercise = {
@@ -87,6 +91,10 @@ export default function WorkoutLog({ onSave, onCancel, initialWorkout }: Workout
       exercises,
     };
     onSave(workout);
+    onSaveConfig({
+      ...config!,
+      exerciseTargets: exTargets
+    });
   };
 
   return (
@@ -136,6 +144,51 @@ export default function WorkoutLog({ onSave, onCancel, initialWorkout }: Workout
                 </Button>
               </CardHeader>
               <CardContent className="space-y-4">
+                {/* Exercise Target */}
+                <div className="p-3 bg-primary/5 rounded-xl border border-primary/10 space-y-2">
+                  <div className="flex items-center gap-2 text-[10px] font-bold uppercase text-primary">
+                    <Trophy className="w-3 h-3" /> Exercise Target
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <Label className="text-[9px] font-bold uppercase text-muted-foreground">Target Weight (kg)</Label>
+                      <Input 
+                        type="number" 
+                        placeholder="0" 
+                        value={exTargets.find(t => t.name.toLowerCase() === exercise.name.toLowerCase())?.targetWeight || ""} 
+                        onChange={(e) => {
+                          const val = parseFloat(e.target.value) || 0;
+                          const existing = exTargets.find(t => t.name.toLowerCase() === exercise.name.toLowerCase());
+                          if (existing) {
+                            setExTargets(exTargets.map(t => t.name.toLowerCase() === exercise.name.toLowerCase() ? { ...t, targetWeight: val } : t));
+                          } else if (exercise.name) {
+                            setExTargets([...exTargets, { name: exercise.name, targetWeight: val, targetReps: 0 }]);
+                          }
+                        }}
+                        className="h-8 text-xs rounded-lg"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-[9px] font-bold uppercase text-muted-foreground">Target Reps</Label>
+                      <Input 
+                        type="number" 
+                        placeholder="0" 
+                        value={exTargets.find(t => t.name.toLowerCase() === exercise.name.toLowerCase())?.targetReps || ""} 
+                        onChange={(e) => {
+                          const val = parseInt(e.target.value) || 0;
+                          const existing = exTargets.find(t => t.name.toLowerCase() === exercise.name.toLowerCase());
+                          if (existing) {
+                            setExTargets(exTargets.map(t => t.name.toLowerCase() === exercise.name.toLowerCase() ? { ...t, targetReps: val } : t));
+                          } else if (exercise.name) {
+                            setExTargets([...exTargets, { name: exercise.name, targetWeight: 0, targetReps: val }]);
+                          }
+                        }}
+                        className="h-8 text-xs rounded-lg"
+                      />
+                    </div>
+                  </div>
+                </div>
+
                 <div className="grid grid-cols-12 gap-2 text-xs font-medium text-muted-foreground px-2">
                   <div className="col-span-2 text-center">SET</div>
                   <div className="col-span-4 text-center">WEIGHT (KG)</div>

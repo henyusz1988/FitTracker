@@ -30,7 +30,7 @@ export interface WeightLog {
 export interface Meal {
   id: string;
   name: string;
-  amount: string;
+  amountGrams: number;
   calories?: number;
 }
 
@@ -59,12 +59,17 @@ export interface DailyMetrics {
   date: string;
   supplements: Supplement[];
   vitamins: Vitamin[];
-  stressLevel: number; // 1-10
-  sleepQuality: number; // 1-10
+  stressLevel: number; // 1-5
+  sleepQuality: number; // 1-5
   waterIntake: number; // in Liters
 }
 
 export interface UserConfig {
   uid: string;
   statOrder: string[];
+  targetWeight?: number;
+  targetWater?: number;
+  supplementTargets?: { name: string; targetGrams: number }[];
+  vitaminTargets?: { name: string; targetMg: number }[];
+  exerciseTargets?: { name: string; targetWeight: number; targetReps: number }[];
 }

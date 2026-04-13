@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Settings as SettingsIcon, ChevronUp, ChevronDown, Save, X, Layout, User as UserIcon, LogOut, Globe } from "lucide-react";
+import { Settings as SettingsIcon, ChevronUp, ChevronDown, Save, X, Layout, User as UserIcon, LogOut, Globe, FileDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useTranslation } from "react-i18next";
@@ -8,7 +8,6 @@ import { UserConfig, Workout, WeightLog, MealLog, DailyMetrics } from "../types"
 import { User } from "firebase/auth";
 import LanguageSelector from "./LanguageSelector";
 import { exportToExcel } from "../lib/exportUtils";
-import { FileDown } from "lucide-react";
 
 interface SettingsProps {
   config: UserConfig | null;
@@ -49,8 +48,8 @@ export default function Settings({
 
   const handleSave = () => {
     onSave({
-      uid: config?.uid || "",
-      statOrder: order
+      ...config!,
+      statOrder: order,
     });
   };
 

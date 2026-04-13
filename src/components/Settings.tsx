@@ -4,19 +4,35 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useTranslation } from "react-i18next";
 import { motion } from "motion/react";
-import { UserConfig } from "../types";
+import { UserConfig, Workout, WeightLog, MealLog, DailyMetrics } from "../types";
 import { User } from "firebase/auth";
 import LanguageSelector from "./LanguageSelector";
+import { exportToExcel } from "../lib/exportUtils";
+import { FileDown } from "lucide-react";
 
 interface SettingsProps {
   config: UserConfig | null;
   user: User | null;
+  workouts: Workout[];
+  weightLogs: WeightLog[];
+  mealLogs: MealLog[];
+  metrics: DailyMetrics[];
   onSave: (config: UserConfig) => void;
   onClose: () => void;
   onLogout: () => void;
 }
 
-export default function Settings({ config, user, onSave, onClose, onLogout }: SettingsProps) {
+export default function Settings({ 
+  config, 
+  user, 
+  workouts, 
+  weightLogs, 
+  mealLogs, 
+  metrics, 
+  onSave, 
+  onClose, 
+  onLogout 
+}: SettingsProps) {
   const { t } = useTranslation();
   const defaultOrder = ['weight', 'water', 'sleep', 'stress'];
   const [order, setOrder] = useState<string[]>(config?.statOrder || defaultOrder);
@@ -86,6 +102,22 @@ export default function Settings({ config, user, onSave, onClose, onLogout }: Se
             <div className="flex justify-center p-2 bg-muted/30 rounded-xl border border-border/50">
               <LanguageSelector />
             </div>
+          </div>
+
+          {/* Export Data */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 text-sm font-bold text-primary uppercase tracking-wider">
+              <FileDown className="w-4 h-4" />
+              Data Management
+            </div>
+            <Button 
+              variant="outline" 
+              onClick={() => exportToExcel(workouts, weightLogs, mealLogs, metrics)}
+              className="w-full rounded-xl border-dashed hover:border-primary hover:text-primary transition-all"
+            >
+              <FileDown className="w-4 h-4 mr-2" />
+              Export to Excel (.xlsx)
+            </Button>
           </div>
 
           <div className="space-y-4">

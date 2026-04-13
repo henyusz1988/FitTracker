@@ -215,6 +215,10 @@ export default function App() {
             <Settings 
               config={userConfig} 
               user={user}
+              workouts={workouts}
+              weightLogs={weightLogs}
+              mealLogs={mealLogs}
+              metrics={metrics}
               onSave={handleSaveConfig} 
               onClose={() => setIsSettingsOpen(false)} 
               onLogout={handleLogout}

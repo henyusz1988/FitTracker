@@ -272,6 +272,7 @@ export default function App() {
                 selectedDate={selectedDate}
                 config={userConfig}
                 onEdit={() => setIsLoggingDaily(true)}
+                onEditWorkout={handleEditWorkout}
               />
             </TabsContent>
             <TabsContent value="history" className="mt-0 focus-visible:ring-0">

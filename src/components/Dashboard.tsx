@@ -15,9 +15,10 @@ interface DashboardProps {
   selectedDate: Date;
   config: UserConfig | null;
   onEdit: () => void;
+  onEditWorkout: (workout: Workout) => void;
 }
 
-export default function Dashboard({ workouts, weightLogs, mealLogs, metrics, selectedDate, config, onEdit }: DashboardProps) {
+export default function Dashboard({ workouts, weightLogs, mealLogs, metrics, selectedDate, config, onEdit, onEditWorkout }: DashboardProps) {
   const { t } = useTranslation();
   const [activeChart, setActiveChart] = useState<{ title: string; data: { date: string; value: number }[]; unit?: string; color?: string } | null>(null);
 
@@ -143,12 +144,20 @@ export default function Dashboard({ workouts, weightLogs, mealLogs, metrics, sel
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card className="border-none shadow-sm bg-muted/40 border border-border/50">
-          <CardHeader className="pb-2">
+        <Card className="border-none shadow-sm bg-muted/40 border border-border/50 group/nutrition relative">
+          <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
             <CardTitle className="text-lg flex items-center gap-2">
               <Utensils className="w-4 h-4 text-primary" />
               {t('nutrition')}
             </CardTitle>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 rounded-full opacity-0 group-hover/nutrition:opacity-100 transition-opacity"
+              onClick={onEdit}
+            >
+              <Pencil className="w-3.5 h-3.5 text-primary" />
+            </Button>
           </CardHeader>
           <CardContent className="space-y-4">
             {dayMeals.length === 0 && (!dayMetrics?.supplements.length) && (!dayMetrics?.vitamins.length) ? (
@@ -206,9 +215,19 @@ export default function Dashboard({ workouts, weightLogs, mealLogs, metrics, sel
             ) : (
               <div className="space-y-3">
                 {dayWorkouts.map((workout) => (
-                  <div key={workout.id} className="p-3 bg-background/60 rounded-xl border border-border/50 shadow-sm">
-                    <p className="text-sm font-bold">{workout.title}</p>
-                    <p className="text-[10px] text-muted-foreground">{workout.exercises.length} {t('exercises')}</p>
+                  <div key={workout.id} className="p-3 bg-background/60 rounded-xl border border-border/50 shadow-sm flex items-center justify-between group/workout">
+                    <div>
+                      <p className="text-sm font-bold">{workout.title}</p>
+                      <p className="text-[10px] text-muted-foreground">{workout.exercises.length} {t('exercises')}</p>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 rounded-full opacity-0 group-hover/workout:opacity-100 transition-opacity"
+                      onClick={() => onEditWorkout(workout)}
+                    >
+                      <Pencil className="w-3.5 h-3.5 text-primary" />
+                    </Button>
                   </div>
                 ))}
               </div>
